@@ -1,0 +1,31 @@
+name: Dry Build on PR
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+      - release/*
+
+jobs:
+  dry-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm i
+      - name: Run lint
+        run: npm run lint
+      - name: Run spellcheck
+        run: npm run spellcheck
+      - name: Create env file
+        run: echo "${{ secrets.ENV_FILE }}" > .env.local
+      - name: Build
+        run: npm run build

@@ -1,0 +1,7 @@
+node_modules/
+build/
+dist/
+public/
+src/legacy-code/
+*.min.js
+*.test.js
