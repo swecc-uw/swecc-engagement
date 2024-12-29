@@ -20,6 +20,7 @@ import adminCommandRpcClient, {
   CommandEvent,
   ConsoleStream,
 } from '../../services/admin/AdminCommandRpc';
+import { devPrint } from '../../components/utils/RandomUtils';
 
 export default function AdminTerminalPage() {
   const [inputHistory, setInputHistory] = useState<string[]>([]);
@@ -70,7 +71,7 @@ export default function AdminTerminalPage() {
         setCopiedMap((prev) => ({ ...prev, [eventId]: false }));
       }, 2000);
     } catch (error) {
-      console.error('Failed to copy:', error);
+      devPrint('Failed to copy:', error);
     }
   };
 

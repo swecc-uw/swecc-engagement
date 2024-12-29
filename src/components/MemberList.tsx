@@ -15,12 +15,18 @@ import {
   SkeletonCircle,
   ButtonGroup,
   Center,
+  Badge,
+  Spacer,
 } from '@chakra-ui/react';
-import { Github, Linkedin, Code2 } from 'lucide-react';
+import { Github, Linkedin, Code2, MapPin, GraduationCap } from 'lucide-react';
 import { Member } from '../types';
 import { resolveName } from './utils/RandomUtils';
 import { START_PAGE } from '../pages/DirectoryPage';
-import { GITHUB_PROFILE_BASE_URL, LEETCODE_API_BASE_URL, LINKEDIN_PROFILE_BASE_URL } from '../constants';
+import {
+  GITHUB_PROFILE_BASE_URL,
+  LEETCODE_PROFILE_BASE_URL,
+  LINKEDIN_PROFILE_BASE_URL,
+} from '../constants';
 
 interface MemberListProps {
   members: Member[];
@@ -32,44 +38,66 @@ interface MemberListProps {
 }
 
 const MemberCard = ({ member }: { member: Member }) => {
-  const bgColor = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
-  const iconColor = useColorModeValue('gray.600', 'gray.400');
+  const bgColor = 'white';
+  const borderColor = 'gray.100';
+  const textColor = 'gray.600';
+  const mutedColor = 'gray.500';
+  const hoverBg = 'gray.50';
+  const iconColor = 'gray.600';
 
   const fullName = resolveName(member);
 
   return (
     <Box
-      p={6}
-      borderWidth={1}
-      borderRadius="lg"
+      p={{ base: 4, md: 6 }}
+      borderWidth="1px"
+      borderRadius="xl"
       borderColor={borderColor}
       bg={bgColor}
       boxShadow="sm"
-      _hover={{ boxShadow: 'md' }}
-      transition="box-shadow 0.2s"
-      minH="140px"
+      _hover={{
+        boxShadow: 'md',
+        borderColor: 'blue.200',
+        bg: hoverBg,
+        transform: 'translateY(-2px)',
+      }}
+      transition="all 0.2s"
       w="100%"
     >
-      <HStack spacing={4} align="start" h="100%">
-        <Avatar size="lg" name={fullName} src={member.profilePictureUrl} />
+      <Flex direction={{ base: 'column', sm: 'row' }} gap={4}>
+        <Avatar
+          size={{ base: 'lg', md: 'xl' }}
+          name={fullName}
+          src={member.profilePictureUrl}
+          borderWidth={2}
+          borderColor="blue.400"
+        />
+
         <Box flex="1">
-          <Flex justify="space-between" align="start">
+          <Flex
+            direction={{ base: 'column', md: 'row' }}
+            gap={{ base: 2, md: 0 }}
+            align={{ base: 'start', md: 'center' }}
+            mb={3}
+          >
             <Box>
-              <Text fontWeight="bold" fontSize="lg">
+              <Text
+                fontWeight="bold"
+                fontSize={{ base: 'lg', md: 'xl' }}
+                lineHeight="short"
+              >
                 {fullName}
               </Text>
-              <Text color="gray.500" fontSize="sm">
+              <Text color={mutedColor} fontSize="sm">
                 @{member.username}
               </Text>
-              {member.major && (
-                <Text color="gray.600" fontSize="sm" mt={1}>
-                  {member.major}
-                </Text>
-              )}
             </Box>
-
-            <HStack spacing={2}>
+            <Spacer minW={4} />
+            <HStack
+              spacing={1}
+              justify={{ base: 'start', md: 'end' }}
+              w={{ base: 'full', md: 'auto' }}
+            >
               {member.github?.username && (
                 <Tooltip label="GitHub Profile">
                   <IconButton
@@ -78,14 +106,14 @@ const MemberCard = ({ member }: { member: Member }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="GitHub Profile"
-                    icon={<Github size={20} />}
+                    icon={<Github size={18} />}
                     variant="ghost"
                     color={iconColor}
                     size="sm"
+                    _hover={{ color: 'blue.500', bg: 'blue.50' }}
                   />
                 </Tooltip>
               )}
-
               {member.linkedin?.username && (
                 <Tooltip label="LinkedIn Profile">
                   <IconButton
@@ -94,65 +122,120 @@ const MemberCard = ({ member }: { member: Member }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="LinkedIn Profile"
-                    icon={<Linkedin size={20} />}
+                    icon={<Linkedin size={18} />}
                     variant="ghost"
                     color={iconColor}
                     size="sm"
+                    _hover={{ color: 'blue.500', bg: 'blue.50' }}
                   />
                 </Tooltip>
               )}
-
               {member.leetcode?.username && (
                 <Tooltip label="LeetCode Profile">
                   <IconButton
                     as="a"
-                    href={`${LEETCODE_API_BASE_URL}${member.leetcode.username}`}
+                    href={`${LEETCODE_PROFILE_BASE_URL}${member.leetcode.username}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="LeetCode Profile"
-                    icon={<Code2 size={20} />}
+                    icon={<Code2 size={18} />}
                     variant="ghost"
                     color={iconColor}
                     size="sm"
+                    _hover={{ color: 'blue.500', bg: 'blue.50' }}
                   />
                 </Tooltip>
               )}
             </HStack>
           </Flex>
 
-          <Box mt={4}>
-            <Link to={`/directory/${member.id}`}>
-              <Button size="sm" colorScheme="brand">
-                View Profile
+          <VStack align="stretch" spacing={2} mb={4}>
+            {member.preview && (
+              <Text color={textColor} fontSize="sm" noOfLines={2}>
+                {member.preview}
+              </Text>
+            )}
+            <Flex
+              gap={3}
+              flexWrap="wrap"
+              color={mutedColor}
+              fontSize="sm"
+              mt={2}
+            >
+              {member.major && (
+                <HStack>
+                  <GraduationCap size={16} />
+                  <Text>{member.major}</Text>
+                </HStack>
+              )}
+              {member.local && (
+                <HStack>
+                  <MapPin size={16} />
+                  <Text>{member.local}</Text>
+                </HStack>
+              )}
+            </Flex>
+          </VStack>
+
+          <Flex
+            gap={3}
+            direction={{ base: 'column', sm: 'row' }}
+            align={{ base: 'stretch', sm: 'center' }}
+          >
+            <Link to={`/directory/${member.id}`} style={{ flex: 1 }}>
+              <Button
+                size="sm"
+                colorScheme="blue"
+                width={{ base: '100%', sm: 'auto' }}
+              >
+                View Full Profile
               </Button>
             </Link>
-          </Box>
+            <HStack spacing={2} justify={{ base: 'start', sm: 'end' }}>
+              {member.role && (
+                <Badge colorScheme="purple" fontSize="xs">
+                  {member.role}
+                </Badge>
+              )}
+              {member.groups?.map((group) => (
+                <Badge key={group.name} colorScheme="blue" fontSize="xs">
+                  {group.name}
+                </Badge>
+              ))}
+            </HStack>
+          </Flex>
         </Box>
-      </HStack>
+      </Flex>
     </Box>
   );
 };
 
 const LoadingCard = () => {
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const borderColor = useColorModeValue('gray.100', 'gray.700');
+  const bgColor = useColorModeValue('white', 'gray.800');
 
   return (
     <Box
-      p={6}
-      borderWidth={1}
-      borderRadius="lg"
+      p={{ base: 4, md: 6 }}
+      borderWidth="1px"
+      borderRadius="xl"
       borderColor={borderColor}
-      minH="140px"
+      bg={bgColor}
       w="100%"
     >
-      <HStack spacing={4} align="start">
-        <SkeletonCircle size="16" />
+      <Flex direction={{ base: 'column', sm: 'row' }} gap={4}>
+        <SkeletonCircle size={{ base: '12', md: '16' }} />
         <Box flex="1">
           <Skeleton height="24px" width="200px" mb={2} />
-          <Skeleton height="20px" width="150px" mb={4} />
-          <Skeleton height="32px" width="100px" />
+          <Skeleton height="16px" width="120px" mb={4} />
+          <Skeleton height="36px" width="120px" mb={2} />
+          <Skeleton height="20px" width="60%" mb={4} />
+          <Flex gap={2}>
+            <Skeleton height="24px" width="100px" />
+            <Skeleton height="24px" width="80px" />
+          </Flex>
         </Box>
-      </HStack>
+      </Flex>
     </Box>
   );
 };
@@ -165,12 +248,10 @@ const MemberList: React.FC<MemberListProps> = ({
   showPagination = true,
   onPageChange,
 }) => {
-  // show loading state with same number of cards as current results
-  // or at least 3 if there are no results yet
   const skeletonCount = loading ? Math.max(members.length, 3) : 0;
 
   return (
-    <VStack spacing={6} align="stretch">
+    <VStack spacing={6} align="stretch" w="100%">
       {loading ? (
         <VStack spacing={4} align="stretch">
           {[...Array(skeletonCount)].map((_, i) => (
@@ -195,19 +276,21 @@ const MemberList: React.FC<MemberListProps> = ({
             <Button
               onClick={() => onPageChange?.(currentPage - 1)}
               isDisabled={currentPage === START_PAGE}
-              colorScheme="brand"
+              colorScheme="blue"
               variant="outline"
+              size="sm"
             >
               Previous
             </Button>
-            <Text>
+            <Text fontSize="sm">
               Page {currentPage} of {totalPages}
             </Text>
             <Button
               onClick={() => onPageChange?.(currentPage + 1)}
               isDisabled={currentPage === totalPages}
-              colorScheme="brand"
+              colorScheme="blue"
               variant="outline"
+              size="sm"
             >
               Next
             </Button>

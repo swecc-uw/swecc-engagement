@@ -17,6 +17,7 @@ import {
   Icon,
   Tooltip,
   Badge,
+  Textarea,
 } from '@chakra-ui/react';
 import {
   FaGithub,
@@ -27,6 +28,7 @@ import {
   FaGraduationCap,
   FaUserEdit,
   FaExclamationTriangle,
+  FaExternalLinkAlt,
 } from 'react-icons/fa';
 import { Member, SocialField } from '../types';
 import ProfilePictureUpload from './ProfilePictureUpload';
@@ -39,6 +41,12 @@ import {
   LINKEDIN_PROFILE_BASE_URL,
   LINKEDIN_REGEX,
 } from '../constants';
+
+const BASE_URLS = {
+  github: GITHUB_PROFILE_BASE_URL,
+  leetcode: LEETCODE_PROFILE_BASE_URL,
+  linkedin: LINKEDIN_PROFILE_BASE_URL,
+};
 
 interface MemberProfileEditProps {
   member: Member;
@@ -83,9 +91,13 @@ const MemberProfileEdit: React.FC<MemberProfileEditProps> = ({
     github: member.github,
     leetcode: member.leetcode,
     local: member.local,
+    preview: member.preview,
+    resumeUrl: member.resumeUrl,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setProfile((prev) => ({
       ...prev,
@@ -97,7 +109,13 @@ const MemberProfileEdit: React.FC<MemberProfileEditProps> = ({
     const [field, key] = e.target.name.split('.');
     if (!isSocialField(field as keyof Member)) return;
 
-    const val = e.target.value?.split('/').pop();
+    const baseUrl = BASE_URLS[field as keyof typeof BASE_URLS];
+
+    if (e.target.value.length < baseUrl.length) {
+      e.target.value = baseUrl;
+    }
+
+    const val = e.target.value.substring(baseUrl.length);
 
     setProfile((prev) => ({
       ...prev,
@@ -216,13 +234,25 @@ const MemberProfileEdit: React.FC<MemberProfileEditProps> = ({
                 placeholder="Enter your last name"
               />
             </FormControl>
+            <FormControl gridColumn={{ md: 'span 2' }}>
+              <FormLabel>Profile Preview</FormLabel>
+              <Input
+                name="preview"
+                value={profile.preview || ''}
+                onChange={handleChange}
+                placeholder="Brief preview text for your profile"
+              />
+              <FormHelperText>
+                A short description that appears under your name
+              </FormHelperText>
+            </FormControl>
           </SimpleGrid>
         </FormSection>
       </Box>
 
       <Divider />
 
-      <Box px={8} py={6}>
+      <Box px={8} py={6} bg={sectionBg}>
         <FormSection title="Academic Information">
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
             <FormControl>
@@ -259,7 +289,7 @@ const MemberProfileEdit: React.FC<MemberProfileEditProps> = ({
 
       <Divider />
 
-      <Box px={8} py={6} bg={sectionBg}>
+      <Box px={8} py={6}>
         <FormSection title="Additional Information">
           <VStack spacing={6}>
             <FormControl>
@@ -278,11 +308,12 @@ const MemberProfileEdit: React.FC<MemberProfileEditProps> = ({
             </FormControl>
             <FormControl>
               <FormLabel>Bio</FormLabel>
-              <Input
+              <Textarea
                 name="bio"
                 value={profile.bio || ''}
                 onChange={handleChange}
                 placeholder="Tell us about yourself"
+                rows={4}
               />
             </FormControl>
           </VStack>
@@ -291,9 +322,9 @@ const MemberProfileEdit: React.FC<MemberProfileEditProps> = ({
 
       <Divider />
 
-      {/* socials */}
-      <Box px={8} py={6}>
-        <FormSection title="Social Links">
+      {/* socials and resume */}
+      <Box px={8} py={6} bg={sectionBg}>
+        <FormSection title="Social Links & Resume">
           <VStack spacing={6}>
             <FormControl isInvalid={linkedinIsInvalid}>
               <FormLabel>
@@ -404,6 +435,25 @@ const MemberProfileEdit: React.FC<MemberProfileEditProps> = ({
                 </FormHelperText>
               )}
             </FormControl>
+
+            <FormControl>
+              <FormLabel>
+                <HStack spacing={2}>
+                  <Icon as={FaExternalLinkAlt} color={iconColor} />
+                  <Text>Resume URL</Text>
+                </HStack>
+              </FormLabel>
+              <Input
+                name="resumeUrl"
+                value={profile.resumeUrl || ''}
+                onChange={handleChange}
+                placeholder="Enter your resume URL (e.g., https://example.com/resume.pdf)"
+              />
+              <FormHelperText>
+                Enter the full URL to your resume (must start with http:// or
+                https://)
+              </FormHelperText>
+            </FormControl>
           </VStack>
         </FormSection>
       </Box>
@@ -415,7 +465,7 @@ const MemberProfileEdit: React.FC<MemberProfileEditProps> = ({
         <Button
           colorScheme="blue"
           size="lg"
-          isDisabled={githubIsInvalid || leetcodeIsInvalid}
+          isDisabled={githubIsInvalid || leetcodeIsInvalid || linkedinIsInvalid}
           onClick={() => onSave(profile)}
           leftIcon={<Icon as={FaUserEdit} />}
         >

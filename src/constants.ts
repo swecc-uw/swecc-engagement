@@ -1,4 +1,4 @@
-export const LOCAL_API_ENDPOINT = 'http://localhost:8000/'
+export const LOCAL_API_ENDPOINT = 'http://localhost:8000/';
 export const PROD_API_ENDPOINT = 'https://api.swecc.org'; // no slash on purpose
 export const LEETCODE_API_BASE_URL = 'https://alfa-leetcode-api.onrender.com/';
 export const GITHUB_PROFILE_BASE_URL = 'https://github.com/';
