@@ -5,7 +5,6 @@ import {
   CardHeader,
   Flex,
   Heading,
-  InputGroup,
   Text,
   Slider,
   SliderFilledTrack,
