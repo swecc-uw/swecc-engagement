@@ -107,7 +107,7 @@ export default function AdminDashboard() {
         label: 'View Sessions',
         to: '/admin/sessions',
       },
-    }
+    },
   ];
 
   return (

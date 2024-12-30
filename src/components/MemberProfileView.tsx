@@ -36,7 +36,10 @@ import {
 import { Member } from '../types';
 import { resolveName } from './utils/RandomUtils';
 import { formatDate } from '../localization';
-import { GITHUB_PROFILE_BASE_URL, LEETCODE_PROFILE_BASE_URL } from '../constants';
+import {
+  GITHUB_PROFILE_BASE_URL,
+  LEETCODE_PROFILE_BASE_URL,
+} from '../constants';
 
 const stripEmptySocials = (member: Member) => {
   if (member.leetcode?.username?.length == 0) {

@@ -1,6 +1,6 @@
-import { useEffect, useState, FormEvent } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { useEffect, useState, FormEvent } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import {
   Box,
   Button,
@@ -36,10 +36,10 @@ const isSessionActive = (session: AttendanceSession): boolean => {
 export default function AdminSessionPage() {
   const [sessions, setSessions] = useState<AttendanceSession[]>([]);
   const [loading, setLoading] = useState(true);
-  const [title, setTitle] = useState("");
-  const [key, setKey] = useState("");
+  const [title, setTitle] = useState('');
+  const [key, setKey] = useState('');
   const [expiresDate, setExpiresDate] = useState<Date | null>(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
@@ -53,10 +53,10 @@ export default function AdminSessionPage() {
   const fetchSessions = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/engagement/attendance/");
+      const response = await api.get('/engagement/attendance/');
       setSessions(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
-      setError("Failed to fetch sessions");
+      setError('Failed to fetch sessions');
       console.error(err);
       setSessions([]);
     } finally {
@@ -66,28 +66,28 @@ export default function AdminSessionPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
 
     if (!expiresDate) {
-      setError("Please select an expiration date");
+      setError('Please select an expiration date');
       return;
     }
 
     const expiresISO = expiresDate.toISOString();
 
     try {
-      await api.post("/engagement/attendance/session", {
+      await api.post('/engagement/attendance/session', {
         title,
         key,
         expires: expiresISO,
       });
-      
+
       fetchSessions();
-      setTitle("");
-      setKey("");
+      setTitle('');
+      setKey('');
       setExpiresDate(null);
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to create session");
+      setError(err.response?.data?.error || 'Failed to create session');
       console.error(err);
     }
   };
@@ -147,20 +147,12 @@ export default function AdminSessionPage() {
                     timeCaption="time"
                     dateFormat="MMMM d, yyyy h:mm aa"
                     minDate={new Date()}
-                    customInput={
-                      <Input
-                        placeholder="Select date and time"
-                      />
-                    }
+                    customInput={<Input placeholder="Select date and time" />}
                     className="chakra-input css-1kp110w"
                   />
                 </FormControl>
 
-                <Button
-                  type="submit"
-                  colorScheme="blue"
-                  isLoading={loading}
-                >
+                <Button type="submit" colorScheme="blue" isLoading={loading}>
                   Create Session
                 </Button>
               </VStack>
@@ -204,7 +196,9 @@ export default function AdminSessionPage() {
                       </HStack>
                       <HStack>
                         <Clock size={16} />
-                        <Text>{new Date(session.expires).toLocaleString()}</Text>
+                        <Text>
+                          {new Date(session.expires).toLocaleString()}
+                        </Text>
                       </HStack>
                       <HStack>
                         <Users size={16} />

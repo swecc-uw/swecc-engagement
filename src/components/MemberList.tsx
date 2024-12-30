@@ -20,7 +20,11 @@ import { Github, Linkedin, Code2 } from 'lucide-react';
 import { Member } from '../types';
 import { resolveName } from './utils/RandomUtils';
 import { START_PAGE } from '../pages/DirectoryPage';
-import { GITHUB_PROFILE_BASE_URL, LEETCODE_API_BASE_URL, LINKEDIN_PROFILE_BASE_URL } from '../constants';
+import {
+  GITHUB_PROFILE_BASE_URL,
+  LEETCODE_API_BASE_URL,
+  LINKEDIN_PROFILE_BASE_URL,
+} from '../constants';
 
 interface MemberListProps {
   members: Member[];
