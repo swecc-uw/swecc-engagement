@@ -143,7 +143,7 @@ export default function AdminSessionPage() {
                     onChange={(date: Date | null) => setExpiresDate(date)}
                     showTimeSelect
                     timeFormat="HH:mm"
-                    timeIntervals={55}
+                    timeIntervals={5}
                     timeCaption="time"
                     dateFormat="MMMM d, yyyy h:mm aa"
                     minDate={new Date()}
