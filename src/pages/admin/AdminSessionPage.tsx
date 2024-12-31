@@ -20,6 +20,7 @@ import { ArrowBackIcon } from '@chakra-ui/icons';
 import { Calendar, Clock, Key, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
+import { toAPIFormat, formatDate } from '../../localization';
 
 interface AttendanceSession {
   id: string;
@@ -73,7 +74,7 @@ export default function AdminSessionPage() {
       return;
     }
 
-    const expiresISO = expiresDate.toISOString();
+    const expiresISO = toAPIFormat(expiresDate, true);
 
     try {
       await api.post('/engagement/attendance/session', {
@@ -197,7 +198,7 @@ export default function AdminSessionPage() {
                       <HStack>
                         <Clock size={16} />
                         <Text>
-                          {new Date(session.expires).toLocaleString()}
+                          {formatDate(session.expires, true)}
                         </Text>
                       </HStack>
                       <HStack>
