@@ -89,7 +89,10 @@ export default function DiscordMessageEngagementDashboardPage() {
 
     const memberTotals = stats.map((record) => ({
       member: record.member,
-      total: Object.values(record.stats).reduce((sum, count) => sum + count, 0),
+      total: Object.values({ ...record.stats }).reduce(
+        (sum, count) => sum + count,
+        0
+      ) / 2
     }));
 
     return {
