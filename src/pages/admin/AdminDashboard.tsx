@@ -13,6 +13,7 @@ import {
   VStack,
   Icon,
 } from '@chakra-ui/react';
+import { FaDiscord } from 'react-icons/fa';
 import { List, Terminal, Cast } from 'lucide-react';
 
 interface AdminCardProps {
@@ -106,6 +107,15 @@ export default function AdminDashboard() {
       primaryAction: {
         label: 'View Sessions',
         to: '/admin/sessions',
+      },
+    },
+    {
+      title: 'Discord Engagement',
+      description: 'View Discord engagement metrics',
+      icon: FaDiscord,
+      primaryAction: {
+        label: 'View Engagement',
+        to: '/admin/discord',
       },
     },
   ];

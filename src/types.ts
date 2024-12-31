@@ -267,7 +267,7 @@ export interface RawSignup {
   user_id: string;
 }
 
-export type DiscordMessageStats = Record<string, number>;
+export type DiscordMessageStats = Record<string, number> & { total: number };
 
 export interface RawStatsResponseRecord {
   member: RawMemberData;
