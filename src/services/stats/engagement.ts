@@ -1,3 +1,4 @@
+import { devPrint } from '../../components/utils/RandomUtils';
 import { AttendanceSession } from '../../types';
 
 export interface StatsDisplay {
@@ -14,7 +15,10 @@ const getAverageAttendance = (sessions: AttendanceSession[]): StatsDisplay => {
     sum += session.attendees.length;
   }
 
-  return { label: 'Average', value: sum / sessions.length };
+  return {
+    label: 'Average',
+    value: parseFloat((sum / sessions.length).toFixed(2)),
+  };
 };
 
 const getTotalSessionCount = (sessions: AttendanceSession[]): StatsDisplay => {
@@ -22,6 +26,10 @@ const getTotalSessionCount = (sessions: AttendanceSession[]): StatsDisplay => {
 };
 
 const minAttendance = (sessions: AttendanceSession[]): StatsDisplay => {
+  if (sessions.length === 0) {
+    return { label: 'Min Attendance', value: 0 };
+  }
+
   return {
     label: 'Min Attendance',
     value: sessions.reduce((prev, curr) =>
@@ -31,6 +39,10 @@ const minAttendance = (sessions: AttendanceSession[]): StatsDisplay => {
 };
 
 const maxAttendance = (sessions: AttendanceSession[]): StatsDisplay => {
+  if (sessions.length === 0) {
+    return { label: 'Max Attendance', value: 0 };
+  }
+
   return {
     label: 'Max Attendance',
     value: sessions.reduce((prev, curr) =>
@@ -47,5 +59,9 @@ export const getStats = (sessions: AttendanceSession[]): StatsDisplay[] => {
     getAverageAttendance,
   ];
 
-  return statHandlers.map((statHandler, _) => statHandler(sessions));
+  return statHandlers.map((statHandler, _) => {
+    const ret = statHandler(sessions);
+    devPrint(ret);
+    return ret;
+  });
 };
