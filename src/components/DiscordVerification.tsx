@@ -24,11 +24,13 @@ import { useAuth } from '../hooks/useAuth';
 interface DiscordVerificationProps {
   checkVerified: () => Promise<boolean>;
   onVerificationSuccess: () => void;
+  username: string;
 }
 
 const DiscordVerification: React.FC<DiscordVerificationProps> = ({
   checkVerified,
   onVerificationSuccess,
+  username,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPolling, setIsPolling] = useState(false);
@@ -102,7 +104,7 @@ const DiscordVerification: React.FC<DiscordVerificationProps> = ({
     if (verificationFailed) {
       toast({
         title: 'Verification Timeout',
-        description: 'Please try running the command again',
+        description: 'Failed to verify within retry limit',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -121,7 +123,8 @@ const DiscordVerification: React.FC<DiscordVerificationProps> = ({
                 Verification Timeout
               </AlertTitle>
               <AlertDescription color="whiteAlpha.900">
-                Please try running the command again
+                Please try running the command again, and ensure you are using
+                your SWECC username ({username})
               </AlertDescription>
             </Box>
           </Alert>
@@ -165,7 +168,7 @@ const DiscordVerification: React.FC<DiscordVerificationProps> = ({
   };
 
   const copyCommand = () => {
-    navigator.clipboard.writeText(`/verify`);
+    navigator.clipboard.writeText('/verify');
     setHasCopied(true);
 
     toast({
@@ -230,16 +233,7 @@ const DiscordVerification: React.FC<DiscordVerificationProps> = ({
   }
 
   return (
-    <Box
-      borderRadius="xl"
-      bg="white"
-      boxShadow="xl"
-      p={8}
-      maxW="md"
-      mx="auto"
-      position="relative"
-      overflow="hidden"
-    >
+    <Box p={8} maxW="md" mx="auto" position="relative" overflow="hidden">
       <VStack spacing={6} align="stretch">
         <HStack justify="space-between" align="center">
           <Heading as="h1" size="lg">
@@ -322,8 +316,15 @@ const DiscordVerification: React.FC<DiscordVerificationProps> = ({
             </Text>
             <Text fontSize="sm" color="gray.600">
               Paste and send the command in any channel, and then enter your
-              username
+              SWECC username ({username}) when prompted
             </Text>
+            <Alert status="info" variant="subtle" mt={4}>
+              <AlertIcon />
+              <AlertTitle fontSize="sm">
+                You must use the username you logged in with, i.e.{' '}
+                <strong>{username}</strong>
+              </AlertTitle>
+            </Alert>
           </Box>
 
           <Box

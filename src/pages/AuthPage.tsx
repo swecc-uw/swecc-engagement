@@ -132,6 +132,7 @@ const AuthPage: React.FC = () => {
               <DiscordVerification
                 checkVerified={checkVerified}
                 onVerificationSuccess={() => navigate('/')}
+                username={member.username}
               />
               {error && (
                 <Text color="red.500" mt={2}>
