@@ -17,53 +17,13 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { ArrowBackIcon } from '@chakra-ui/icons';
-import { Calendar, Clock, Key, Users } from 'lucide-react';
+import { Calendar, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { formatDate } from '../../localization';
-import { useAttendanceSessions, isSessionActive } from '../../hooks/useAttendanceSessions';
-
-interface SessionCardProps {
-  session: {
-    id: string;
-    title: string;
-    key: string;
-    expires: string;
-    attendees: any[];
-  };
-  borderColor: string;
-  cardBg: string;
-}
-
-function SessionCard({ session, borderColor, cardBg }: SessionCardProps) {
-  return (
-    <Box
-      key={session.id}
-      p={4}
-      borderWidth="1px"
-      borderRadius="md"
-      borderColor={borderColor}
-      bg={cardBg}
-    >
-      <VStack align="stretch" spacing={2}>
-        <Heading size="sm">{session.title}</Heading>
-        <HStack>
-          <Key size={16} />
-          <Text>{session.key}</Text>
-        </HStack>
-        <HStack>
-          <Clock size={16} />
-          <Text>
-            {formatDate(session.expires, true)}
-          </Text>
-        </HStack>
-        <HStack>
-          <Users size={16} />
-          <Text>{session.attendees.length} attendees</Text>
-        </HStack>
-      </VStack>
-    </Box>
-  );
-}
+import {
+  useAttendanceSessions,
+  isSessionActive,
+} from '../../hooks/useAttendanceSessions';
+import { SessionCard } from '../../components/admin/SessionCard';
 
 export default function AdminSessionPage() {
   const [title, setTitle] = useState('');
