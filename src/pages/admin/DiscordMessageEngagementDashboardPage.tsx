@@ -18,9 +18,53 @@ import {
   SimpleGrid,
   Flex,
 } from '@chakra-ui/react';
-import { queryMessageStats } from '../../services/engagement';
+import {
+  parseChannelIds,
+  parseMemberIds,
+  queryMessageStats,
+} from '../../services/engagement';
 import { StatsResponseRecord } from '../../types';
 import { resolveName } from '../../components/utils/RandomUtils';
+
+function ChannelStats({
+  channel,
+  count,
+  progress,
+}: {
+  channel: string;
+  count: number;
+  progress: number;
+}) {
+  return (
+    <Box key={channel}>
+      <Flex justify="space-between" mb={1}>
+        <Text fontWeight="medium">{channel}</Text>
+        <Badge colorScheme="blue">{count}</Badge>
+      </Flex>
+      <Progress value={progress} colorScheme="blue" borderRadius="full" />
+    </Box>
+  );
+}
+
+function MemberStats({
+  member,
+  total,
+  progress,
+}: {
+  member: StatsResponseRecord['member'];
+  total: number;
+  progress: number;
+}) {
+  return (
+    <Box key={member.id}>
+      <Flex justify="space-between" mb={1}>
+        <Text fontWeight="medium">{resolveName(member)}</Text>
+        <Badge colorScheme="green">{total}</Badge>
+      </Flex>
+      <Progress value={progress} colorScheme="green" borderRadius="full" />
+    </Box>
+  );
+}
 
 export default function DiscordMessageEngagementDashboardPage() {
   const [memberIdsInput, setMemberIdsInput] = useState<string>('');
@@ -75,27 +119,6 @@ export default function DiscordMessageEngagementDashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const parseMemberIds = (input: string): number[] => {
-    if (!input.trim()) return [];
-    return input
-      .split(',')
-      .map((id) => id.trim())
-      .filter((id) => id !== '')
-      .map((id) => {
-        const num = Number(id);
-        return !isNaN(num) ? num : null;
-      })
-      .filter((id): id is number => id !== null);
-  };
-
-  const parseChannelIds = (input: string): string[] => {
-    if (!input.trim()) return [];
-    return input
-      .split(',')
-      .map((id) => id.trim())
-      .filter((id) => id !== '');
   };
 
   return (
@@ -175,19 +198,14 @@ export default function DiscordMessageEngagementDashboardPage() {
                   {Object.entries(aggregatedStats.channelTotals)
                     .sort(([, a], [, b]) => b - a)
                     .map(([channel, count]) => (
-                      <Box key={channel}>
-                        <Flex justify="space-between" mb={1}>
-                          <Text fontWeight="medium">{channel}</Text>
-                          <Badge colorScheme="blue">{count}</Badge>
-                        </Flex>
-                        <Progress
-                          value={
-                            (count / aggregatedStats.maxChannelMessages) * 100
-                          }
-                          colorScheme="blue"
-                          borderRadius="full"
-                        />
-                      </Box>
+                      <ChannelStats
+                        key={channel}
+                        channel={channel}
+                        count={count}
+                        progress={
+                          (count / aggregatedStats.maxChannelMessages) * 100
+                        }
+                      />
                     ))}
                 </Stack>
               </CardBody>
@@ -202,19 +220,12 @@ export default function DiscordMessageEngagementDashboardPage() {
                   {aggregatedStats.memberTotals
                     .sort((a, b) => b.total - a.total)
                     .map(({ member, total }) => (
-                      <Box key={member.id}>
-                        <Flex justify="space-between" mb={1}>
-                          <Text fontWeight="medium">{resolveName(member)}</Text>
-                          <Badge colorScheme="green">{total}</Badge>
-                        </Flex>
-                        <Progress
-                          value={
-                            (total / aggregatedStats.maxChannelMessages) * 100
-                          }
-                          colorScheme="green"
-                          borderRadius="full"
-                        />
-                      </Box>
+                      <MemberStats
+                        key={member.id}
+                        member={member}
+                        total={total}
+                        progress={(total / aggregatedStats.totalMessages) * 100}
+                      />
                     ))}
                 </Stack>
               </CardBody>
