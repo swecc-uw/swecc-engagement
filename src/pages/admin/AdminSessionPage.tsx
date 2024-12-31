@@ -19,7 +19,6 @@ import {
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { Calendar, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { formatDate } from '../../localization';
 import {
   useAttendanceSessions,
   isSessionActive,
