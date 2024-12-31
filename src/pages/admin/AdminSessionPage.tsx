@@ -19,11 +19,9 @@ import {
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { Calendar, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import {
-  useAttendanceSessions,
-  isSessionActive,
-} from '../../hooks/useAttendanceSessions';
+import { useAttendanceSessions } from '../../hooks/useAttendanceSessions';
 import { SessionCard } from '../../components/admin/SessionCard';
+import { isSessionActive } from '../../services/engagement';
 
 export default function AdminSessionPage() {
   const [title, setTitle] = useState('');
@@ -140,7 +138,7 @@ export default function AdminSessionPage() {
               <VStack spacing={4} align="stretch">
                 {activeSessions.map((session) => (
                   <SessionCard
-                    key={session.id}
+                    key={session.sessionId}
                     session={session}
                     borderColor={borderColor}
                     cardBg={cardBg}

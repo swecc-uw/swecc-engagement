@@ -13,8 +13,8 @@ import {
   VStack,
   Icon,
 } from '@chakra-ui/react';
+import { List, Terminal, Cast, PencilRuler } from 'lucide-react';
 import { FaDiscord } from 'react-icons/fa';
-import { List, Terminal, Cast } from 'lucide-react';
 
 interface AdminCardProps {
   title: string;
@@ -107,6 +107,15 @@ export default function AdminDashboard() {
       primaryAction: {
         label: 'View Sessions',
         to: '/admin/sessions',
+      },
+    },
+    {
+      title: 'Engagement Metrics',
+      description: 'View engagement metrics for meetings',
+      icon: PencilRuler,
+      primaryAction: {
+        label: 'View Metrics',
+        to: '/admin/attendance',
       },
     },
     {

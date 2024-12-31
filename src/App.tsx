@@ -16,6 +16,7 @@ import AdminRoute from './components/admin/AdminRoute';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ResetPasswordForm from './pages/ResetPassword';
 import AdminConsolePage from './pages/admin/AdminConsolePage';
+import { AdminEngagementPage } from './pages/admin/AdminEngagementPage';
 import APIClient from './pages/admin/APIClient';
 import DiscordMessageEngagementDashboardPage from './pages/admin/DiscordMessageEngagementDashboardPage';
 import AdminSessionPage from './pages/admin/AdminSessionPage';
@@ -65,6 +66,26 @@ const App: React.FC = () => {
                 <ProtectedRoute>
                   <AdminRoute>
                     <AdminDashboard />
+                  </AdminRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/attendance/"
+              element={
+                <ProtectedRoute>
+                  <AdminRoute>
+                    <AdminEngagementPage />
+                  </AdminRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/console"
+              element={
+                <ProtectedRoute>
+                  <AdminRoute>
+                    <AdminConsolePage />
                   </AdminRoute>
                 </ProtectedRoute>
               }
