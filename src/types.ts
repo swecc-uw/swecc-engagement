@@ -282,3 +282,15 @@ export interface AttendanceSession {
   expires: Date;
   attendees: number[];
 }
+
+export type DiscordMessageStats = Record<string, number> & { total: number };
+
+export interface RawStatsResponseRecord {
+  member: RawMemberData;
+  stats: DiscordMessageStats;
+}
+
+export interface StatsResponseRecord {
+  member: Member;
+  stats: DiscordMessageStats;
+}
