@@ -1,4 +1,4 @@
-import { useEffect, useState, FormEvent } from 'react';
+import { useState, FormEvent } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import {
@@ -19,77 +19,32 @@ import {
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { Calendar, Clock, Key, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import api from '../../services/api';
-import { toAPIFormat, formatDate } from '../../localization';
-
-interface AttendanceSession {
-  id: string;
-  title: string;
-  key: string;
-  expires: string;
-  attendees: string[];
-}
-
-const isSessionActive = (session: AttendanceSession): boolean => {
-  return new Date(session.expires) > new Date();
-};
+import { formatDate } from '../../localization';
+import { useAttendanceSessions, isSessionActive } from '../../hooks/useAttendanceSessions';
 
 export default function AdminSessionPage() {
-  const [sessions, setSessions] = useState<AttendanceSession[]>([]);
-  const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState('');
   const [key, setKey] = useState('');
   const [expiresDate, setExpiresDate] = useState<Date | null>(null);
-  const [error, setError] = useState('');
+  const { sessions, loading, error, createSession } = useAttendanceSessions();
 
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   const activeSessions = sessions.filter(isSessionActive);
 
-  useEffect(() => {
-    fetchSessions();
-  }, []);
-
-  const fetchSessions = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get('/engagement/attendance/');
-      setSessions(Array.isArray(response.data) ? response.data : []);
-    } catch (err) {
-      setError('Failed to fetch sessions');
-      console.error(err);
-      setSessions([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError('');
 
     if (!expiresDate) {
-      setError('Please select an expiration date');
       return;
     }
 
-    const expiresISO = toAPIFormat(expiresDate, true);
-
-    try {
-      await api.post('/engagement/attendance/session', {
-        title,
-        key,
-        expires: expiresISO,
-      });
-
-      fetchSessions();
+    const success = await createSession(title, key, expiresDate);
+    if (success) {
       setTitle('');
       setKey('');
       setExpiresDate(null);
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to create session');
-      console.error(err);
     }
   };
 
