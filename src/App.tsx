@@ -16,6 +16,8 @@ import AdminRoute from './components/admin/AdminRoute';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ResetPasswordForm from './pages/ResetPassword';
 import AdminConsolePage from './pages/admin/AdminConsolePage';
+import APIClient from './pages/admin/APIClient';
+import DiscordMessageEngagementDashboardPage from './pages/admin/DiscordMessageEngagementDashboardPage';
 
 const App: React.FC = () => {
   return (
@@ -76,7 +78,36 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-            <Route path="/admin/console" element={<AdminConsolePage />} />
+            <Route
+              path="/admin/console"
+              element={
+                <ProtectedRoute>
+                  <AdminRoute>
+                    <AdminConsolePage />
+                  </AdminRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/api-client"
+              element={
+                <ProtectedRoute>
+                  <AdminRoute>
+                    <APIClient />
+                  </AdminRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/engagement/message"
+              element={
+                <ProtectedRoute>
+                  <AdminRoute>
+                    <DiscordMessageEngagementDashboardPage />
+                  </AdminRoute>
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </Layout>
       </HashRouter>
