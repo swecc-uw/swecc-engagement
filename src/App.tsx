@@ -17,6 +17,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import ResetPasswordForm from './pages/ResetPassword';
 import AdminConsolePage from './pages/admin/AdminConsolePage';
 import { AdminEngagementPage } from './pages/admin/AdminEngagementPage';
+import AdminSessionPage from './pages/admin/AdminSessionPage';
 
 const App: React.FC = () => {
   return (
@@ -98,6 +99,7 @@ const App: React.FC = () => {
               }
             />
             <Route path="/admin/console" element={<AdminConsolePage />} />
+            <Route path="/admin/sessions" element={<AdminSessionPage />} />
           </Routes>
         </Layout>
       </HashRouter>
