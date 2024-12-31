@@ -272,7 +272,7 @@ export interface RawAttendanceSession {
   key: string;
   title: string;
   expires: string;
-  attendees: RawMemberData[];
+  attendees: number[];
 }
 
 export interface AttendanceSession {
@@ -280,5 +280,5 @@ export interface AttendanceSession {
   key: string;
   title: string;
   expires: Date;
-  attendees: Member[];
+  attendees: number[];
 }

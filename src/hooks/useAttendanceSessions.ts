@@ -1,17 +1,11 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { toAPIFormat } from '../localization';
-
-export interface AttendanceSession {
-  id: string;
-  title: string;
-  key: string;
-  expires: string;
-  attendees: string[];
-}
+import { AttendanceSession } from '../types';
+import { getAllSessions } from '../services/engagement';
 
 export const isSessionActive = (session: AttendanceSession): boolean => {
-  return new Date(session.expires) > new Date();
+  return session.expires > new Date();
 };
 
 export function useAttendanceSessions() {
@@ -22,8 +16,8 @@ export function useAttendanceSessions() {
   const fetchSessions = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/engagement/attendance/');
-      setSessions(Array.isArray(response.data) ? response.data : []);
+      const allSessions = await getAllSessions();
+      setSessions(allSessions);
     } catch (err) {
       setError('Failed to fetch sessions');
       console.error(err);

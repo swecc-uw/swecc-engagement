@@ -24,15 +24,10 @@ import {
   useAttendanceSessions,
   isSessionActive,
 } from '../../hooks/useAttendanceSessions';
+import { AttendanceSession } from '../../types';
 
 interface SessionCardProps {
-  session: {
-    id: string;
-    title: string;
-    key: string;
-    expires: string;
-    attendees: any[];
-  };
+  session: AttendanceSession;
   borderColor: string;
   cardBg: string;
 }
@@ -40,7 +35,7 @@ interface SessionCardProps {
 function SessionCard({ session, borderColor, cardBg }: SessionCardProps) {
   return (
     <Box
-      key={session.id}
+      key={session.sessionId}
       p={4}
       borderWidth="1px"
       borderRadius="md"
@@ -181,7 +176,7 @@ export default function AdminSessionPage() {
               <VStack spacing={4} align="stretch">
                 {activeSessions.map((session) => (
                   <SessionCard
-                    key={session.id}
+                    key={session.sessionId}
                     session={session}
                     borderColor={borderColor}
                     cardBg={cardBg}

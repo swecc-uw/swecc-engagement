@@ -1,32 +1,21 @@
+import { devPrint } from '../components/utils/RandomUtils';
 import { parseAnyDate } from '../localization';
-import { AttendanceSession, RawAttendanceSession, Member } from '../types';
+import { AttendanceSession, RawAttendanceSession } from '../types';
 import api from './api';
-import { deserializeMember } from './member';
 
 const deserializeSessionData = ({
-  attendees,
-  expires,
   session_id,
+  expires,
   ...rest
 }: RawAttendanceSession): AttendanceSession => {
-  let deserializedMembers: Member[] = [];
-
-  for (const rawMember of attendees) {
-    deserializedMembers = [
-      ...deserializedMembers,
-      deserializeMember(rawMember),
-    ];
-  }
-
   return {
     ...rest,
     sessionId: session_id,
-    attendees: deserializedMembers,
     expires: parseAnyDate(expires),
   };
 };
 
-const getAllSessions = async () => {
+export const getAllSessions = async (): Promise<AttendanceSession[]> => {
   const url = `/engagement/attendance/`;
 
   const res = await api.get(url);
@@ -38,5 +27,11 @@ const getAllSessions = async () => {
     throw new Error('Failed to fetch all sessions');
   }
 
-  return deserializeSessionData(res.data);
+  const allSessions: AttendanceSession[] = [];
+
+  for (const session of res.data) {
+    allSessions.push(deserializeSessionData(session));
+  }
+
+  return allSessions;
 };
