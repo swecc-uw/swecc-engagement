@@ -33,7 +33,11 @@ export function useAttendanceSessions() {
     }
   };
 
-  const createSession = async (title: string, key: string, expiresDate: Date) => {
+  const createSession = async (
+    title: string,
+    key: string,
+    expiresDate: Date
+  ) => {
     setError('');
     const expiresISO = toAPIFormat(expiresDate, true);
 
