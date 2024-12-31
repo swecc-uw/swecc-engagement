@@ -100,7 +100,7 @@ const App: React.FC = () => {
               }
             />
             <Route
-              path="/admin/engagement/message"
+              path="/admin/discord"
               element={
                 <ProtectedRoute>
                   <AdminRoute>

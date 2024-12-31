@@ -77,9 +77,7 @@ export default function DiscordMessageEngagementDashboardPage() {
     if (!stats.length) return null;
 
     const totalMessages = stats.reduce((acc, record) => {
-      return (
-        acc + Object.values(record.stats).reduce((sum, count) => sum + count, 0)
-      );
+      return acc + record.stats.total;
     }, 0);
 
     const channelTotals = stats.reduce((acc, record) => {
@@ -91,7 +89,10 @@ export default function DiscordMessageEngagementDashboardPage() {
 
     const memberTotals = stats.map((record) => ({
       member: record.member,
-      total: Object.values(record.stats).reduce((sum, count) => sum + count, 0),
+      total: Object.values({ ...record.stats }).reduce(
+        (sum, count) => sum + count,
+        0
+      ) / 2
     }));
 
     return {
