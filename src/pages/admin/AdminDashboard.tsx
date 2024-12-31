@@ -13,7 +13,7 @@ import {
   VStack,
   Icon,
 } from '@chakra-ui/react';
-import { List, Terminal } from 'lucide-react';
+import { List, Terminal, Cast } from 'lucide-react';
 
 interface AdminCardProps {
   title: string;
@@ -97,6 +97,15 @@ export default function AdminDashboard() {
       primaryAction: {
         label: 'Open Console',
         to: '/admin/console',
+      },
+    },
+    {
+      title: 'Manage Sessions',
+      description: 'View and manage user sessions',
+      icon: Cast,
+      primaryAction: {
+        label: 'View Sessions',
+        to: '/admin/sessions',
       },
     },
   ];
