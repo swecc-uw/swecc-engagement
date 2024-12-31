@@ -16,6 +16,7 @@ import AdminRoute from './components/admin/AdminRoute';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ResetPasswordForm from './pages/ResetPassword';
 import AdminConsolePage from './pages/admin/AdminConsolePage';
+import { AdminEngagementPage } from './pages/admin/AdminEngagementPage';
 
 const App: React.FC = () => {
   return (
@@ -62,6 +63,16 @@ const App: React.FC = () => {
                 <ProtectedRoute>
                   <AdminRoute>
                     <AdminDashboard />
+                  </AdminRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/engagement/"
+              element={
+                <ProtectedRoute>
+                  <AdminRoute>
+                    <AdminEngagementPage />
                   </AdminRoute>
                 </ProtectedRoute>
               }
