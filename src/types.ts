@@ -266,3 +266,19 @@ export interface RawSignup {
   username: string;
   user_id: string;
 }
+
+export interface RawAttendanceSession {
+  session_id: string;
+  key: string;
+  title: string;
+  expires: string;
+  attendees: RawMemberData[];
+}
+
+export interface AttendanceSession {
+  sessionId: string;
+  key: string;
+  title: string;
+  expires: Date;
+  attendees: Member[];
+}
