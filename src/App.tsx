@@ -18,6 +18,7 @@ import ResetPasswordForm from './pages/ResetPassword';
 import AdminConsolePage from './pages/admin/AdminConsolePage';
 import APIClient from './pages/admin/APIClient';
 import DiscordMessageEngagementDashboardPage from './pages/admin/DiscordMessageEngagementDashboardPage';
+import AdminSessionPage from './pages/admin/AdminSessionPage';
 
 const App: React.FC = () => {
   return (
@@ -108,6 +109,7 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               }
             />
+            <Route path="/admin/sessions" element={<AdminSessionPage />} />
           </Routes>
         </Layout>
       </HashRouter>

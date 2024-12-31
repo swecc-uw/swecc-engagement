@@ -46,6 +46,7 @@ import ReportPopup from '../components/ReportPopUp';
 import {
   GITHUB_PROFILE_BASE_URL,
   LEETCODE_PROFILE_BASE_URL,
+  LINKEDIN_PROFILE_BASE_URL,
 } from '../constants';
 
 const stripEmptySocials = (member: Member) => {
@@ -377,7 +378,7 @@ const MemberProfileView: React.FC<MemberProfileViewProps> = ({ member }) => {
               <SocialLink
                 icon={FaLinkedin}
                 label="LinkedIn Profile"
-                href={member.linkedin.username}
+                href={`${LINKEDIN_PROFILE_BASE_URL}${member.linkedin.username}`}
                 username={member.linkedin.username}
               />
             )}
