@@ -71,7 +71,7 @@ const App: React.FC = () => {
               }
             />
             <Route
-              path="/admin/engagement/"
+              path="/admin/attendance/"
               element={
                 <ProtectedRoute>
                   <AdminRoute>

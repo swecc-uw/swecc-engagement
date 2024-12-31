@@ -115,7 +115,7 @@ export default function AdminDashboard() {
       icon: PencilRuler,
       primaryAction: {
         label: 'View Metrics',
-        to: '/admin/engagement',
+        to: '/admin/attendance',
       },
     },
     {
