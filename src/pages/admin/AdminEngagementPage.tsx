@@ -7,6 +7,7 @@ import {
   HStack,
   Text,
   SimpleGrid,
+  Divider,
 } from '@chakra-ui/react';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -33,6 +34,7 @@ export const AdminEngagementPage: React.FC<Props> = () => {
           Go back
         </Button>
         <Heading>Engagement Metrics</Heading>
+        <Divider />
         {stats.map(({ label, value }, idx) => {
           return (
             <Box key={idx}>
@@ -43,7 +45,8 @@ export const AdminEngagementPage: React.FC<Props> = () => {
             </Box>
           );
         })}
-        <Heading>All Sessions</Heading>
+        <Heading mt={4}>All Sessions</Heading>
+        <Divider />
         {loading ? (
           <Text>Loading sessions...</Text>
         ) : (
