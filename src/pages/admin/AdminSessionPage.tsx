@@ -19,11 +19,9 @@ import {
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { Calendar, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import {
-  useAttendanceSessions,
-  isSessionActive,
-} from '../../hooks/useAttendanceSessions';
+import { useAttendanceSessions } from '../../hooks/useAttendanceSessions';
 import { SessionCard } from '../../components/admin/SessionCard';
+import { isSessionActive } from '../../services/engagement';
 
 export default function AdminSessionPage() {
   const [title, setTitle] = useState('');

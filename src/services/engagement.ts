@@ -17,6 +17,10 @@ const deserializeSessionData = ({
   };
 };
 
+export const isSessionActive = (session: AttendanceSession): boolean => {
+  return session.expires > new Date();
+};
+
 export const getAllSessions = async (): Promise<AttendanceSession[]> => {
   const url = `/engagement/attendance/`;
 
@@ -29,13 +33,7 @@ export const getAllSessions = async (): Promise<AttendanceSession[]> => {
     throw new Error('Failed to fetch all sessions');
   }
 
-  const allSessions: AttendanceSession[] = [];
-
-  for (const session of res.data) {
-    allSessions.push(deserializeSessionData(session));
-  }
-
-  return allSessions;
+  return res.data.map(deserializeSessionData);
 };
 
 function deserializeDiscordStatsResponseRecord({

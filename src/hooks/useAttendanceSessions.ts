@@ -4,10 +4,6 @@ import { toAPIFormat } from '../localization';
 import { AttendanceSession } from '../types';
 import { getAllSessions } from '../services/engagement';
 
-export const isSessionActive = (session: AttendanceSession): boolean => {
-  return session.expires > new Date();
-};
-
 export function useAttendanceSessions() {
   const [sessions, setSessions] = useState<AttendanceSession[]>([]);
   const [loading, setLoading] = useState(true);

@@ -18,9 +18,7 @@ import { formatDate } from '../../localization';
 import { SessionStatus } from '../../components/admin/SessionStatus';
 import { getStats, StatsDisplay } from '../../services/stats/engagement';
 
-interface Props {}
-
-export const AdminEngagementPage: React.FC<Props> = () => {
+export const AdminEngagementPage: React.FC = () => {
   const { sessions, loading } = useAttendanceSessions();
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
@@ -29,7 +27,7 @@ export const AdminEngagementPage: React.FC<Props> = () => {
 
   return (
     <Box>
-      <VStack align={'flex-start'}>
+      <VStack align="flex-start">
         <Button as={Link} to="/admin" leftIcon={<ArrowBackIcon />} mb={2}>
           Go back
         </Button>
@@ -59,7 +57,7 @@ export const AdminEngagementPage: React.FC<Props> = () => {
                 borderRadius="md"
                 borderColor={borderColor}
                 bg={cardBg}
-                cursor={'pointer'}
+                cursor="pointer"
               >
                 <VStack align="stretch" spacing={2}>
                   <Heading size="sm">{session.title}</Heading>

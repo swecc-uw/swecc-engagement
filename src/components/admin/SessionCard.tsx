@@ -1,15 +1,10 @@
 import { VStack, HStack, Text, Box, Heading } from '@chakra-ui/react';
 import { Key, Clock, Users } from 'lucide-react';
 import { formatDate } from '../../localization';
+import { AttendanceSession } from '../../types';
 
 interface SessionCardProps {
-  session: {
-    id: string;
-    title: string;
-    key: string;
-    expires: string;
-    attendees: any[];
-  };
+  session: AttendanceSession;
   borderColor: string;
   cardBg: string;
 }
@@ -21,7 +16,7 @@ export function SessionCard({
 }: SessionCardProps) {
   return (
     <Box
-      key={session.id}
+      key={session.sessionId}
       p={4}
       borderWidth="1px"
       borderRadius="md"
