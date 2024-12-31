@@ -27,7 +27,6 @@ import {
 
 import { AttendanceSession } from '../../types';
 
-
 interface SessionCardProps {
   session: AttendanceSession;
   borderColor: string;

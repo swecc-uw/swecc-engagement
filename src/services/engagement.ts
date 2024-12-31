@@ -38,8 +38,6 @@ export const getAllSessions = async (): Promise<AttendanceSession[]> => {
   return allSessions;
 };
 
-
-
 function deserializeDiscordStatsResponseRecord({
   member,
   ...rest
