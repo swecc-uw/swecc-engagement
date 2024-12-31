@@ -20,7 +20,10 @@ import { ArrowBackIcon } from '@chakra-ui/icons';
 import { Calendar, Clock, Key, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { formatDate } from '../../localization';
-import { useAttendanceSessions, isSessionActive } from '../../hooks/useAttendanceSessions';
+import {
+  useAttendanceSessions,
+  isSessionActive,
+} from '../../hooks/useAttendanceSessions';
 
 export default function AdminSessionPage() {
   const [title, setTitle] = useState('');
@@ -152,9 +155,7 @@ export default function AdminSessionPage() {
                       </HStack>
                       <HStack>
                         <Clock size={16} />
-                        <Text>
-                          {formatDate(session.expires, true)}
-                        </Text>
+                        <Text>{formatDate(session.expires, true)}</Text>
                       </HStack>
                       <HStack>
                         <Users size={16} />
