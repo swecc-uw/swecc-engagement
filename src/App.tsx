@@ -78,6 +78,16 @@ const App: React.FC = () => {
               }
             />
             <Route
+              path="/admin/console"
+              element={
+                <ProtectedRoute>
+                  <AdminRoute>
+                    <AdminConsolePage />
+                  </AdminRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/protected"
               element={
                 <ProtectedRoute>
