@@ -8,6 +8,7 @@ import {
   ButtonGroup,
 } from '@chakra-ui/react';
 import { DiscordServer } from '../../types';
+import { MultiSelect, Option } from 'chakra-multiselect';
 
 interface ChannelSelectorProps {
   server: DiscordServer | null;
@@ -25,12 +26,9 @@ export function ChannelSelector({
   >('dropdown');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
 
-  const initialChannels = useMemo(
-    () => value.split(',').filter(Boolean),
-    [value]
+  const [selectedChannels, setSelectedChannels] = useState<Partial<Option>[]>(
+    []
   );
-  const [selectedChannels, setSelectedChannels] =
-    useState<string[]>(initialChannels);
 
   const categories = useMemo(() => {
     if (!server) return [];
@@ -68,18 +66,39 @@ export function ChannelSelector({
 
   const handleManualInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.trim();
-    setSelectedChannels(value.split(',').filter(Boolean));
+    setSelectedChannels(
+      value
+        .split(',')
+        .filter(Boolean)
+        .map((v) => ({ value: v }))
+    );
     onChange(value);
   };
 
-  const handleDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selected = Array.from(
-      e.target.selectedOptions,
-      (option) => option.value
-    );
-    setSelectedChannels(selected);
-    onChange(selected.join(','));
+  const handleDropdownChange = (e: Option | Option[]) => {
+    const selectedOptions = Array.isArray(e) ? e : [e];
+
+    setSelectedChannels(selectedOptions);
+    onChange(selectedOptions.map((option) => option.value).join(','));
   };
+
+  const channelIdNameMap = useMemo(() => {
+    if (!server) return {};
+    const res: any = {};
+    for (const channel of server.getAllChannels()) {
+      res[channel.id.toString()] = channel.name;
+    }
+    return res;
+  }, [server]);
+
+  const defaultValues = useMemo(() => {
+    return value
+      .split(',')
+      .filter((v) => !!channelIdNameMap[v])
+      .map((v) => {
+        return channelIdNameMap[v];
+      });
+  }, [value]);
 
   const handleCategorySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const categoryId = e.target.value;
@@ -87,7 +106,11 @@ export function ChannelSelector({
     if (categoryId) {
       const channelsInCategory =
         server?.getChannelsInCategory(Number(categoryId)) || [];
-      setSelectedChannels(channelsInCategory.map(String));
+      setSelectedChannels(
+        channelsInCategory.map((v, idx) => {
+          return { value: String(v), label: String(v) };
+        })
+      );
       onChange(channelsInCategory.join(','));
     } else {
       setSelectedChannels([]);
@@ -127,20 +150,17 @@ export function ChannelSelector({
       )}
 
       {selectionMode === 'dropdown' && (
-        <Select
-          placeholder="Select channels"
-          multiple={true}
+        <MultiSelect
           value={selectedChannels}
-          onChange={handleDropdownChange}
           size="md"
           height={40}
-        >
-          {filteredChannels.map((channel) => (
-            <option key={channel.value} value={channel.value}>
-              {channel.label}
-            </option>
-          ))}
-        </Select>
+          label="Select channels"
+          onChange={handleDropdownChange}
+          defaultValue={defaultValues}
+          options={filteredChannels.map((channel) => {
+            return { label: channel.label, value: channel.value as string };
+          })}
+        />
       )}
 
       {selectionMode === 'category' && (

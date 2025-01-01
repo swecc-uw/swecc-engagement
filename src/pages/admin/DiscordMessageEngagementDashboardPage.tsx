@@ -26,7 +26,7 @@ import {
 } from '../../services/engagement';
 import { getDiscordChannelConfig } from '../../services/admin/metasync';
 import { DiscordServer, StatsResponseRecord } from '../../types';
-import { resolveName } from '../../components/utils/RandomUtils';
+import { devPrint, resolveName } from '../../components/utils/RandomUtils';
 import { MultiSelect, Option } from 'chakra-multiselect';
 import { useMembers } from '../../hooks/useMembers';
 import { ChannelSelector } from '../../components/admin/ChannelSelector';
@@ -151,6 +151,7 @@ export default function DiscordMessageEngagementDashboardPage() {
   useEffect(() => {
     getDiscordChannelConfig().then((server) => {
       discordServerRef.current = server;
+      devPrint(discordServerRef.current);
     });
   }, [refreshConfigSignal]);
 
