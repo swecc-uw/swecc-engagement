@@ -1,8 +1,27 @@
-import { VStack, HStack, Text, Box, Heading } from '@chakra-ui/react';
+import {
+  VStack,
+  HStack,
+  Text,
+  Box,
+  Heading,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Button,
+  Divider,
+  Flex,
+} from '@chakra-ui/react';
 import { Key, Clock, Users } from 'lucide-react';
 import { formatDate } from '../../localization';
-import { AttendanceSession } from '../../types';
+import { AttendanceSession, SessionUserInfo } from '../../types';
 import { SessionStatus } from './SessionStatus';
+import { Link } from 'react-router-dom';
+import { ExternalLinkIcon } from '@chakra-ui/icons';
 
 interface SessionCardProps {
   session: AttendanceSession;
@@ -15,6 +34,17 @@ export function SessionCard({
   borderColor,
   cardBg,
 }: SessionCardProps) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const sampleAttendees: SessionUserInfo[] = [];
+
+  for (let i = 0; i < 30; i++) {
+    sampleAttendees.push({
+      username: `User ${i + 1}`,
+      id: i,
+    });
+  }
+
   return (
     <Box
       key={session.sessionId}
@@ -24,6 +54,7 @@ export function SessionCard({
       borderColor={borderColor}
       bg={cardBg}
       cursor="pointer"
+      onClick={onOpen}
     >
       <VStack align="stretch" spacing={2}>
         <Heading size="sm">{session.title}</Heading>
@@ -41,6 +72,60 @@ export function SessionCard({
           <Text>{session.attendees.length} attendees</Text>
         </HStack>
       </VStack>
+
+      <Modal size={'lg'} isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            <HStack>
+              <Text fontSize="large">{session.title}</Text>
+              <SessionStatus expires={new Date(session.expires)} />
+            </HStack>
+            <Divider mt={1} />
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack align="center">
+              <Heading fontSize="lg">
+                Attendees ({session.attendees.length} total)
+              </Heading>
+              <Box
+                maxH={'200px'}
+                borderWidth="1px"
+                borderRadius="md"
+                borderColor={borderColor}
+                overflowY={'auto'}
+                w="70%"
+              >
+                {session.attendees.map((attendee, idx) => {
+                  return (
+                    <Flex
+                      key={idx}
+                      h="10%"
+                      paddingBlock={2}
+                      justify="center"
+                      align="center"
+                      as={Link}
+                      to={`/directory/${attendee.id}`}
+                      borderBottomWidth={'1px'}
+                      borderColor={borderColor}
+                    >
+                      <Text>
+                        {attendee.username} <ExternalLinkIcon mb={0.5} />
+                      </Text>
+                    </Flex>
+                  );
+                })}
+              </Box>
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={onClose} mr={3}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 }
