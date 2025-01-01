@@ -233,7 +233,7 @@ export default function DiscordMessageEngagementDashboardPage() {
           <Stack spacing={6}>
             <Heading size="lg">Discord Message Metrics</Heading>
 
-            <HStack w="100%" spacing={4}>
+            <HStack w="100%" spacing={4} alignItems={'flex-end'}>
               <Box w="50%">
                 <Text mb={2} fontWeight="medium">
                   Members

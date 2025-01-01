@@ -152,8 +152,6 @@ export function ChannelSelector({
       {selectionMode === 'dropdown' && (
         <MultiSelect
           value={selectedChannels}
-          size="md"
-          height={40}
           label="Select channels"
           onChange={handleDropdownChange}
           defaultValue={defaultValues}
