@@ -2,6 +2,7 @@ import { VStack, HStack, Text, Box, Heading } from '@chakra-ui/react';
 import { Key, Clock, Users } from 'lucide-react';
 import { formatDate } from '../../localization';
 import { AttendanceSession } from '../../types';
+import { SessionStatus } from './SessionStatus';
 
 interface SessionCardProps {
   session: AttendanceSession;
@@ -22,12 +23,14 @@ export function SessionCard({
       borderRadius="md"
       borderColor={borderColor}
       bg={cardBg}
+      cursor="pointer"
     >
       <VStack align="stretch" spacing={2}>
         <Heading size="sm">{session.title}</Heading>
         <HStack>
           <Key size={16} />
           <Text>{session.key}</Text>
+          <SessionStatus expires={new Date(session.expires)} />
         </HStack>
         <HStack>
           <Clock size={16} />

@@ -61,7 +61,6 @@ export const getStats = (sessions: AttendanceSession[]): StatsDisplay[] => {
 
   return statHandlers.map((statHandler, _) => {
     const ret = statHandler(sessions);
-    devPrint(ret);
     return ret;
   });
 };
