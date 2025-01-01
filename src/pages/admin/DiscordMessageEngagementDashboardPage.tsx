@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Box,
   Button,
@@ -21,13 +21,12 @@ import {
 } from '@chakra-ui/react';
 import {
   parseChannelIds,
-  parseMemberIds,
   parseSelectedOptions,
   queryMessageStats,
 } from '../../services/engagement';
 import { StatsResponseRecord } from '../../types';
-import { devPrint, resolveName } from '../../components/utils/RandomUtils';
-import { MultiSelect, Option, useMultiSelect } from 'chakra-multiselect';
+import { resolveName } from '../../components/utils/RandomUtils';
+import { MultiSelect, Option } from 'chakra-multiselect';
 import { useMembers } from '../../hooks/useMembers';
 
 function ChannelStats({
