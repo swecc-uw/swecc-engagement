@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import {
   Box,
   Button,
@@ -17,14 +17,18 @@ import {
   Badge,
   SimpleGrid,
   Flex,
+  HStack,
 } from '@chakra-ui/react';
 import {
   parseChannelIds,
   parseMemberIds,
+  parseSelectedOptions,
   queryMessageStats,
 } from '../../services/engagement';
 import { StatsResponseRecord } from '../../types';
-import { resolveName } from '../../components/utils/RandomUtils';
+import { devPrint, resolveName } from '../../components/utils/RandomUtils';
+import { MultiSelect, Option, useMultiSelect } from 'chakra-multiselect';
+import { useMembers } from '../../hooks/useMembers';
 
 function ChannelStats({
   channel,
@@ -67,11 +71,13 @@ function MemberStats({
 }
 
 export default function DiscordMessageEngagementDashboardPage() {
-  const [memberIdsInput, setMemberIdsInput] = useState<string>('');
   const [channelIdsInput, setChannelIdsInput] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState<StatsResponseRecord[]>([]);
   const toast = useToast();
+
+  const { options, isLoading: areMembersLoading } = useMembers();
+  const [selectedMembers, setSelectedMembers] = useState<Option | Option[]>([]);
 
   const aggregatedStats = useMemo(() => {
     if (!stats.length) return null;
@@ -106,9 +112,9 @@ export default function DiscordMessageEngagementDashboardPage() {
   const handleQuery = async () => {
     setLoading(true);
     try {
-      const memberIds = parseMemberIds(memberIdsInput);
+      const memberQuery = parseSelectedOptions(selectedMembers);
       const channelIds = parseChannelIds(channelIdsInput);
-      const stats = await queryMessageStats(memberIds, channelIds);
+      const stats = await queryMessageStats(memberQuery, channelIds);
       setStats(stats);
     } catch (e) {
       toast({
@@ -129,19 +135,23 @@ export default function DiscordMessageEngagementDashboardPage() {
           <Stack spacing={6}>
             <Heading size="lg">Discord Message Metrics</Heading>
 
-            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-              <Box>
+            <HStack w="100%" spacing={4}>
+              <Box w="50%">
                 <Text mb={2} fontWeight="medium">
                   Members
                 </Text>
-                <Input
-                  placeholder="Enter member IDs (comma-separated)"
-                  value={memberIdsInput}
-                  onChange={(e) => setMemberIdsInput(e.target.value)}
-                  bg="whiteAlpha.50"
-                />
+                {!areMembersLoading && (
+                  <MultiSelect
+                    value={selectedMembers}
+                    options={options}
+                    onChange={(value) => {
+                      setSelectedMembers(value);
+                    }}
+                    label="Select members to view stats for"
+                  ></MultiSelect>
+                )}
               </Box>
-              <Box>
+              <Box mt={5} w="50%">
                 <Text mb={2} fontWeight="medium">
                   Channels
                 </Text>
@@ -152,7 +162,7 @@ export default function DiscordMessageEngagementDashboardPage() {
                   bg="whiteAlpha.50"
                 />
               </Box>
-            </SimpleGrid>
+            </HStack>
 
             <Button
               onClick={handleQuery}

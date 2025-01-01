@@ -4,6 +4,7 @@ import { AttendanceSession, RawAttendanceSession } from '../types';
 import api from './api';
 import { RawStatsResponseRecord, StatsResponseRecord } from '../types';
 import { deserializeMember } from './member';
+import { Option } from 'chakra-multiselect';
 
 const deserializeSessionData = ({
   session_id,
@@ -103,4 +104,12 @@ export function queryMessageStats(memberIds: number[], channelIds: string[]) {
     .then((response) =>
       response.data.map(deserializeDiscordStatsResponseRecord)
     );
+}
+
+export function parseSelectedOptions(selections: Option | Option[]): number[] {
+  if (Array.isArray(selections)) {
+    return selections.map((v, idx) => parseInt(v.value as string));
+  }
+
+  return [parseInt(selections.value as string)];
 }
