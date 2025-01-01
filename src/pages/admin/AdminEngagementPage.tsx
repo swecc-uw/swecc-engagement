@@ -8,6 +8,8 @@ import {
   Text,
   SimpleGrid,
   Divider,
+  Grid,
+  GridItem,
 } from '@chakra-ui/react';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -17,6 +19,7 @@ import { Key, Clock, Users } from 'lucide-react';
 import { formatDate } from '../../localization';
 import { SessionStatus } from '../../components/admin/SessionStatus';
 import { getStats, StatsDisplay } from '../../services/stats/engagement';
+import { SessionPlot } from '../../components/admin/SessionPlot';
 
 export const AdminEngagementPage: React.FC = () => {
   const { sessions, loading } = useAttendanceSessions();
@@ -33,16 +36,30 @@ export const AdminEngagementPage: React.FC = () => {
         </Button>
         <Heading>Engagement Metrics</Heading>
         <Divider />
-        {stats.map(({ label, value }, idx) => {
-          return (
-            <Box key={idx}>
-              <HStack>
-                <Text fontWeight="semibold">{label}: </Text>
-                <Text>{value}</Text>
-              </HStack>
-            </Box>
-          );
-        })}
+        {sessions.length && (
+          <Grid
+            w="100%"
+            h="max-content"
+            templateColumns="repeat(5, 1fr)"
+            gap={6}
+          >
+            <GridItem colSpan={1}>
+              {stats.map(({ label, value }, idx) => {
+                return (
+                  <Box key={idx}>
+                    <HStack>
+                      <Text fontWeight="semibold">{label}: </Text>
+                      <Text>{value}</Text>
+                    </HStack>
+                  </Box>
+                );
+              })}
+            </GridItem>
+            <GridItem h="100%" colSpan={4}>
+              <SessionPlot sessions={sessions} />
+            </GridItem>
+          </Grid>
+        )}
         <Heading mt={4}>All Sessions</Heading>
         <Divider />
         {loading ? (
