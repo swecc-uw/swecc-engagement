@@ -87,18 +87,15 @@ function MemberStats({
   total,
   progress,
   isSelected,
-  onToggle,
 }: {
   member: StatsResponseRecord['member'];
   total: number;
   progress: number;
   isSelected: boolean;
-  onToggle: (id: string) => void;
 }) {
   return (
     <Box
       cursor="pointer"
-      onClick={() => onToggle('' + member.id)}
       bg={isSelected ? 'whiteAlpha.200' : 'transparent'}
       _hover={{ bg: 'whiteAlpha.100' }}
       borderRadius="md"
@@ -164,16 +161,6 @@ export default function DiscordMessageEngagementDashboardPage() {
       currentChannels.add(channelId);
     }
     setChannelIdsInput(Array.from(currentChannels).join(','));
-  };
-
-  const handleToggleMember = (memberId: string) => {
-    const currentMembers = new Set(selectedMemberIds);
-    if (currentMembers.has(memberId)) {
-      currentMembers.delete(memberId);
-    } else {
-      currentMembers.add(memberId);
-    }
-    // setMemberIdsInput(Array.from(currentMembers).join(','));
   };
 
   const aggregatedStats = useMemo(() => {
@@ -352,7 +339,6 @@ export default function DiscordMessageEngagementDashboardPage() {
                         total={total}
                         progress={(total / aggregatedStats.totalMessages) * 100}
                         isSelected={selectedMemberIds.has('' + member.id)}
-                        onToggle={handleToggleMember}
                       />
                     ))}
                 </Stack>
