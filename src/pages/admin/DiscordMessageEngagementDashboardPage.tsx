@@ -16,7 +16,6 @@ import {
   Badge,
   SimpleGrid,
   Flex,
-  HStack,
   Tooltip,
 } from '@chakra-ui/react';
 import { parseChannelIds, queryMessageStats } from '../../services/engagement';
