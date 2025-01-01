@@ -267,12 +267,17 @@ export interface RawSignup {
   user_id: string;
 }
 
+export interface SessionUserInfo {
+  username: string;
+  id: number;
+}
+
 export interface RawAttendanceSession {
   session_id: string;
   key: string;
   title: string;
   expires: string;
-  attendees: number[];
+  attendees: SessionUserInfo[];
 }
 
 export interface AttendanceSession {
@@ -280,7 +285,7 @@ export interface AttendanceSession {
   key: string;
   title: string;
   expires: Date;
-  attendees: number[];
+  attendees: SessionUserInfo[];
 }
 
 export type DiscordMessageStats = Record<string, number>;
