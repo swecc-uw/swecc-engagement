@@ -1,4 +1,3 @@
-import { devPrint } from '../../components/utils/RandomUtils';
 import { AttendanceSession } from '../../types';
 
 export interface StatsDisplay {

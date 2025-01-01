@@ -19,7 +19,7 @@ import {
 } from '@chakra-ui/react';
 import { Key, Clock, Users } from 'lucide-react';
 import { formatDate } from '../../localization';
-import { AttendanceSession, SessionUserInfo } from '../../types';
+import { AttendanceSession } from '../../types';
 import { SessionStatus } from './SessionStatus';
 import { Link } from 'react-router-dom';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
