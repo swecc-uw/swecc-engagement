@@ -76,23 +76,23 @@ export default function DiscordMessageEngagementDashboardPage() {
   const aggregatedStats = useMemo(() => {
     if (!stats.length) return null;
 
-    const totalMessages = stats.reduce((acc, record) => {
-      return acc + record.stats.total;
-    }, 0);
-
     const channelTotals = stats.reduce((acc, record) => {
       Object.entries(record.stats).forEach(([channel, count]) => {
-        acc[channel] = (acc[channel] || 0) + count;
+        if (channel !== 'total') acc[channel] = (acc[channel] || 0) + count;
       });
       return acc;
     }, {} as Record<string, number>);
 
+    const totalMessages = Object.values(channelTotals).reduce(
+      (sum, count) => sum + count,
+      0
+    );
+
     const memberTotals = stats.map((record) => ({
       member: record.member,
-      total: Object.values({ ...record.stats }).reduce(
-        (sum, count) => sum + count,
-        0
-      ) / 2
+      total: Object.entries(record.stats)
+        .filter(([channel]) => channel !== 'total')
+        .reduce((sum, [, count]) => sum + count, 0),
     }));
 
     return {
