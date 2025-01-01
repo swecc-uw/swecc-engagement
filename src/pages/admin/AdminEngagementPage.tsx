@@ -39,7 +39,7 @@ export const AdminEngagementPage: React.FC = () => {
         {sessions.length && (
           <Grid
             w="100%"
-            h={'max-content'}
+            h="max-content"
             templateColumns="repeat(5, 1fr)"
             gap={6}
           >
