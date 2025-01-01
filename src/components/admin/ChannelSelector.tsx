@@ -13,14 +13,12 @@ interface ChannelSelectorProps {
   server: DiscordServer | null;
   value: string;
   onChange: (value: string) => void;
-  placeholder?: string;
 }
 
 export function ChannelSelector({
   server,
   value,
   onChange,
-  placeholder = 'Select channels or enter IDs',
 }: ChannelSelectorProps) {
   const [selectionMode, setSelectionMode] = useState<
     'manual' | 'dropdown' | 'category'
