@@ -19,11 +19,7 @@ import {
   HStack,
   Tooltip,
 } from '@chakra-ui/react';
-import {
-  parseChannelIds,
-  parseSelectedOptions,
-  queryMessageStats,
-} from '../../services/engagement';
+import { parseChannelIds, queryMessageStats } from '../../services/engagement';
 import { getDiscordChannelConfig } from '../../services/admin/metasync';
 import { DiscordServer, StatsResponseRecord } from '../../types';
 import { devPrint, resolveName } from '../../components/utils/RandomUtils';
@@ -31,6 +27,14 @@ import { MultiSelect, Option } from 'chakra-multiselect';
 import { useMembers } from '../../hooks/useMembers';
 import { ChannelSelector } from '../../components/admin/ChannelSelector';
 import { RefreshCcw } from 'lucide-react';
+
+function parseSelectedOptions(selections: Option | Option[]): number[] {
+  if (Array.isArray(selections)) {
+    return selections.map((v, idx) => parseInt(v.value as string));
+  }
+
+  return [parseInt(selections.value as string)];
+}
 
 function ChannelStats({
   channelId,
@@ -220,7 +224,12 @@ export default function DiscordMessageEngagementDashboardPage() {
           <Stack spacing={6}>
             <Heading size="lg">Discord Message Metrics</Heading>
 
-            <HStack w="100%" spacing={4} alignItems={'flex-end'}>
+            <Flex
+              w="100%"
+              gap={4}
+              flexDir={{ md: 'row', sm: 'column', lg: 'row', base: 'column' }}
+              alignItems="flex-start"
+            >
               <Box w="50%">
                 <Text mb={2} fontWeight="medium">
                   Members
@@ -258,7 +267,7 @@ export default function DiscordMessageEngagementDashboardPage() {
                   onChange={setChannelIdsInput}
                 />
               </Box>
-            </HStack>
+            </Flex>
 
             <Button
               onClick={handleQuery}

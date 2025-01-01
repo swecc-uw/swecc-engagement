@@ -15,8 +15,7 @@ export const useMembers = () => {
     setIsLoading(true);
     setError(undefined);
     try {
-      const data = await getAllMembers();
-      setMembers(data);
+      setMembers(await getAllMembers());
     } catch (e) {
       const errorMessage = (e as Error).message;
       setError(errorMessage);
