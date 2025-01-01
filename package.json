@@ -14,8 +14,10 @@
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
-    "@emotion/react": "^11.13.0",
-    "@emotion/styled": "^11.13.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^6.3.0",
+    "@mui/x-charts": "^7.23.2",
     "@saas-ui/theme-glass": "^0.5.5",
     "@supabase/supabase-js": "^2.39.8",
     "@types/react-datepicker": "^6.2.0",
