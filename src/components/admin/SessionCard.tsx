@@ -15,6 +15,7 @@ import {
   Button,
   Divider,
   Flex,
+  Spacer,
 } from '@chakra-ui/react';
 import { Key, Clock, Users } from 'lucide-react';
 import { formatDate } from '../../localization';
@@ -35,15 +36,6 @@ export function SessionCard({
   cardBg,
 }: SessionCardProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const sampleAttendees: SessionUserInfo[] = [];
-
-  for (let i = 0; i < 30; i++) {
-    sampleAttendees.push({
-      username: `User ${i + 1}`,
-      id: i,
-    });
-  }
 
   return (
     <Box
@@ -119,10 +111,27 @@ export function SessionCard({
               </Box>
             </VStack>
           </ModalBody>
-          <ModalFooter>
-            <Button onClick={onClose} mr={3}>
-              Close
-            </Button>
+          <ModalFooter mt={4} borderTopWidth="1px" borderTopColor={borderColor}>
+            <HStack
+              w="100%"
+              mb={4}
+              justify="space-between"
+              align="center"
+              spacing={2}
+            >
+              <HStack>
+                <Key size={16} />
+                <Text>{session.key}</Text>
+              </HStack>
+              <HStack>
+                <Clock size={16} />
+                <Text>{formatDate(session.expires, true)}</Text>
+              </HStack>
+              <Spacer />
+              <Button size="md" onClick={onClose} mr={3}>
+                Close
+              </Button>
+            </HStack>
           </ModalFooter>
         </ModalContent>
       </Modal>
