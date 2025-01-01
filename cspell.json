@@ -10,7 +10,8 @@
         "elimelt",
         "Glassdoor",
         "Formik",
-        "kwargs"
+        "kwargs",
+        "metasync",
     ],
     "ignorePaths": [
         "node_modules/**",

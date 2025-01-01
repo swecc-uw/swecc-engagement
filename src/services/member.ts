@@ -116,3 +116,14 @@ export async function isCurrentMemberVerified(): Promise<boolean> {
     )
     .catch(() => false);
 }
+
+export async function getAllMembers(): Promise<Member[]> {
+  const url = `/members/`;
+
+  const res = await api.get(url);
+
+  if (res.status !== 200 || !Object.prototype.hasOwnProperty.call(res, 'data'))
+    throw new Error('Failed to fetch all members');
+
+  return res.data.map(deserializeMember);
+}
