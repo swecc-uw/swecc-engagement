@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -17,31 +17,65 @@ import {
   Badge,
   SimpleGrid,
   Flex,
+  Tooltip,
 } from '@chakra-ui/react';
 import {
   parseChannelIds,
   parseMemberIds,
   queryMessageStats,
 } from '../../services/engagement';
-import { StatsResponseRecord } from '../../types';
+import { getDiscordChannelConfig } from '../../services/admin/metasync';
+import { DiscordServer, StatsResponseRecord } from '../../types';
 import { resolveName } from '../../components/utils/RandomUtils';
+import { ChannelSelector } from '../../components/admin/ChannelSelector';
+import { RefreshCcw } from 'lucide-react';
 
 function ChannelStats({
+  channelId,
   channel,
   count,
   progress,
+  isSelected,
+  onToggle,
 }: {
+  channelId: string;
   channel: string;
   count: number;
   progress: number;
+  isSelected: boolean;
+  onToggle: (id: string) => void;
 }) {
   return (
-    <Box key={channel}>
-      <Flex justify="space-between" mb={1}>
-        <Text fontWeight="medium">{channel}</Text>
-        <Badge colorScheme="blue">{count}</Badge>
-      </Flex>
-      <Progress value={progress} colorScheme="blue" borderRadius="full" />
+    <Box
+      cursor="pointer"
+      onClick={() => onToggle(channelId)}
+      bg={isSelected ? 'whiteAlpha.200' : 'transparent'}
+      _hover={{ bg: 'whiteAlpha.100' }}
+      borderRadius="md"
+      p={2}
+      transition="all 0.2s"
+    >
+      {channel === 'total' ? (
+        <Text fontWeight="bold">Total Messages</Text>
+      ) : (
+        <Tooltip
+          label={
+            isSelected
+              ? 'Click to remove from selection'
+              : 'Click to add to selection'
+          }
+        >
+          <Flex justify="space-between" mb={1}>
+            <Text fontWeight="medium">{channel}</Text>
+            <Badge colorScheme={isSelected ? 'green' : 'blue'}>{count}</Badge>
+          </Flex>
+        </Tooltip>
+      )}
+      <Progress
+        value={progress}
+        colorScheme={isSelected ? 'green' : 'blue'}
+        borderRadius="full"
+      />
     </Box>
   );
 }
@@ -50,18 +84,42 @@ function MemberStats({
   member,
   total,
   progress,
+  isSelected,
+  onToggle,
 }: {
   member: StatsResponseRecord['member'];
   total: number;
   progress: number;
+  isSelected: boolean;
+  onToggle: (id: string) => void;
 }) {
   return (
-    <Box key={member.id}>
-      <Flex justify="space-between" mb={1}>
-        <Text fontWeight="medium">{resolveName(member)}</Text>
-        <Badge colorScheme="green">{total}</Badge>
-      </Flex>
-      <Progress value={progress} colorScheme="green" borderRadius="full" />
+    <Box
+      cursor="pointer"
+      onClick={() => onToggle('' + member.id)}
+      bg={isSelected ? 'whiteAlpha.200' : 'transparent'}
+      _hover={{ bg: 'whiteAlpha.100' }}
+      borderRadius="md"
+      p={2}
+      transition="all 0.2s"
+    >
+      <Tooltip
+        label={
+          isSelected
+            ? 'Click to remove from selection'
+            : 'Click to add to selection'
+        }
+      >
+        <Flex justify="space-between" mb={1}>
+          <Text fontWeight="medium">{resolveName(member)}</Text>
+          <Badge colorScheme={isSelected ? 'green' : 'blue'}>{total}</Badge>
+        </Flex>
+      </Tooltip>
+      <Progress
+        value={progress}
+        colorScheme={isSelected ? 'green' : 'blue'}
+        borderRadius="full"
+      />
     </Box>
   );
 }
@@ -71,14 +129,54 @@ export default function DiscordMessageEngagementDashboardPage() {
   const [channelIdsInput, setChannelIdsInput] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState<StatsResponseRecord[]>([]);
+  const [refreshConfigSignal, setRefreshConfigSignal] = useState(0);
   const toast = useToast();
+
+  const discordServerRef = useRef<DiscordServer | null>(null);
+
+  const selectedChannelIds = useMemo(
+    () => new Set(channelIdsInput.split(',').filter(Boolean)),
+    [channelIdsInput]
+  );
+
+  const selectedMemberIds = useMemo(
+    () => new Set(memberIdsInput.split(',').filter(Boolean)),
+    [memberIdsInput]
+  );
+
+  useEffect(() => {
+    getDiscordChannelConfig().then((server) => {
+      discordServerRef.current = server;
+    });
+  }, [refreshConfigSignal]);
+
+  const handleToggleChannel = (channelId: string) => {
+    if (channelId === 'total') return;
+    const currentChannels = new Set(selectedChannelIds);
+    if (currentChannels.has(channelId)) {
+      currentChannels.delete(channelId);
+    } else {
+      currentChannels.add(channelId);
+    }
+    setChannelIdsInput(Array.from(currentChannels).join(','));
+  };
+
+  const handleToggleMember = (memberId: string) => {
+    const currentMembers = new Set(selectedMemberIds);
+    if (currentMembers.has(memberId)) {
+      currentMembers.delete(memberId);
+    } else {
+      currentMembers.add(memberId);
+    }
+    setMemberIdsInput(Array.from(currentMembers).join(','));
+  };
 
   const aggregatedStats = useMemo(() => {
     if (!stats.length) return null;
 
     const channelTotals = stats.reduce((acc, record) => {
       Object.entries(record.stats).forEach(([channel, count]) => {
-        if (channel !== 'total') acc[channel] = (acc[channel] || 0) + count;
+        acc[channel] = (acc[channel] || 0) + count;
       });
       return acc;
     }, {} as Record<string, number>);
@@ -90,9 +188,10 @@ export default function DiscordMessageEngagementDashboardPage() {
 
     const memberTotals = stats.map((record) => ({
       member: record.member,
-      total: Object.entries(record.stats)
-        .filter(([channel]) => channel !== 'total')
-        .reduce((sum, [, count]) => sum + count, 0),
+      total: Object.entries(record.stats).reduce(
+        (sum, [, count]) => sum + count,
+        0
+      ),
     }));
 
     return {
@@ -142,14 +241,25 @@ export default function DiscordMessageEngagementDashboardPage() {
                 />
               </Box>
               <Box>
-                <Text mb={2} fontWeight="medium">
+                <Text
+                  mb={2}
+                  fontWeight="medium"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
                   Channels
+                  <Button
+                    size="sm"
+                    onClick={() => setRefreshConfigSignal((s) => s + 1)}
+                  >
+                    <RefreshCcw size={16} />
+                  </Button>
                 </Text>
-                <Input
-                  placeholder="Enter channel IDs (comma-separated)"
+                <ChannelSelector
+                  server={discordServerRef.current}
                   value={channelIdsInput}
-                  onChange={(e) => setChannelIdsInput(e.target.value)}
-                  bg="whiteAlpha.50"
+                  onChange={setChannelIdsInput}
                 />
               </Box>
             </SimpleGrid>
@@ -201,11 +311,17 @@ export default function DiscordMessageEngagementDashboardPage() {
                     .map(([channel, count]) => (
                       <ChannelStats
                         key={channel}
-                        channel={channel}
+                        channelId={channel}
+                        channel={
+                          discordServerRef.current?.getChannel(Number(channel))
+                            ?.name || channel
+                        }
                         count={count}
                         progress={
                           (count / aggregatedStats.maxChannelMessages) * 100
                         }
+                        isSelected={selectedChannelIds.has(channel)}
+                        onToggle={handleToggleChannel}
                       />
                     ))}
                 </Stack>
@@ -226,6 +342,8 @@ export default function DiscordMessageEngagementDashboardPage() {
                         member={member}
                         total={total}
                         progress={(total / aggregatedStats.totalMessages) * 100}
+                        isSelected={selectedMemberIds.has('' + member.id)}
+                        onToggle={handleToggleMember}
                       />
                     ))}
                 </Stack>
