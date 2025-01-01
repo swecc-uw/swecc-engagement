@@ -15,9 +15,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAttendanceSessions } from '../../hooks/useAttendanceSessions';
 import { useColorModeValue } from '@chakra-ui/react';
-import { getStats, StatsDisplay } from '../../services/stats/engagement';
+import {
+  calculateSessionStats,
+  SessionStats,
+} from '../../services/stats/engagement';
 import { SessionPlot } from '../../components/admin/SessionPlot';
-import { devPrint } from '../../components/utils/RandomUtils';
 import { SessionCard } from '../../components/admin/SessionCard';
 
 export const AdminEngagementPage: React.FC = () => {
@@ -25,9 +27,7 @@ export const AdminEngagementPage: React.FC = () => {
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
 
-  devPrint(sessions);
-
-  const stats: StatsDisplay[] = getStats(sessions);
+  const stats: SessionStats[] = calculateSessionStats(sessions);
 
   return (
     <Box>

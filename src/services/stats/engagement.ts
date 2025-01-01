@@ -1,13 +1,13 @@
 import { AttendanceSession } from '../../types';
 
-export interface StatsDisplay {
+export interface SessionStats {
   label: string;
   value: number;
 }
 
-type StatHandler = (sessions: AttendanceSession[]) => StatsDisplay;
+type StatHandler = (sessions: AttendanceSession[]) => SessionStats;
 
-const getAverageAttendance = (sessions: AttendanceSession[]): StatsDisplay => {
+const getAverageAttendance = (sessions: AttendanceSession[]): SessionStats => {
   let sum = 0;
 
   for (const session of sessions) {
@@ -20,11 +20,11 @@ const getAverageAttendance = (sessions: AttendanceSession[]): StatsDisplay => {
   };
 };
 
-const getTotalSessionCount = (sessions: AttendanceSession[]): StatsDisplay => {
+const getTotalSessionCount = (sessions: AttendanceSession[]): SessionStats => {
   return { label: 'Total Sessions', value: sessions.length };
 };
 
-const minAttendance = (sessions: AttendanceSession[]): StatsDisplay => {
+const minAttendance = (sessions: AttendanceSession[]): SessionStats => {
   if (sessions.length === 0) {
     return { label: 'Min Attendance', value: 0 };
   }
@@ -37,7 +37,7 @@ const minAttendance = (sessions: AttendanceSession[]): StatsDisplay => {
   };
 };
 
-const maxAttendance = (sessions: AttendanceSession[]): StatsDisplay => {
+const maxAttendance = (sessions: AttendanceSession[]): SessionStats => {
   if (sessions.length === 0) {
     return { label: 'Max Attendance', value: 0 };
   }
@@ -50,7 +50,9 @@ const maxAttendance = (sessions: AttendanceSession[]): StatsDisplay => {
   };
 };
 
-export const getStats = (sessions: AttendanceSession[]): StatsDisplay[] => {
+export const calculateSessionStats = (
+  sessions: AttendanceSession[]
+): SessionStats[] => {
   const statHandlers: StatHandler[] = [
     getTotalSessionCount,
     minAttendance,

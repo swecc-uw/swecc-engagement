@@ -82,11 +82,11 @@ export function SessionCard({
                 Attendees ({session.attendees.length} total)
               </Heading>
               <Box
-                maxH={'200px'}
+                maxH="200px"
                 borderWidth="1px"
                 borderRadius="md"
                 borderColor={borderColor}
-                overflowY={'auto'}
+                overflowY="auto"
                 w="70%"
               >
                 {session.attendees.map((attendee, idx) => {
@@ -99,7 +99,7 @@ export function SessionCard({
                       align="center"
                       as={Link}
                       to={`/directory/${attendee.id}`}
-                      borderBottomWidth={'1px'}
+                      borderBottomWidth="1px"
                       borderColor={borderColor}
                     >
                       <Text>
