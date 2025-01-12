@@ -90,17 +90,20 @@ function MemberStats({
   total,
   progress,
   isSelected,
+  onToggle,
 }: {
   member: StatsResponseRecord['member'];
   total: number;
   progress: number;
   isSelected: boolean;
+  onToggle: (id: string) => void;
 }) {
   return (
     <Box
       cursor="pointer"
       bg={isSelected ? 'whiteAlpha.200' : 'transparent'}
       _hover={{ bg: 'whiteAlpha.100' }}
+      onClick={() => onToggle('' + member.id)}
       borderRadius="md"
       p={2}
       transition="all 0.2s"
@@ -166,6 +169,32 @@ export default function DiscordMessageEngagementDashboardPage() {
     setChannelIdsInput(Array.from(currentChannels).join(','));
   };
 
+  const handleToggleMember = (memberId: string) => {
+    const currentSelected = Array.isArray(selectedMembers)
+      ? selectedMembers
+      : selectedMembers
+      ? [selectedMembers]
+      : [];
+
+    const memberIndex = currentSelected.findIndex((m) => m.value === memberId);
+
+    let newSelectedMembers;
+    if (memberIndex >= 0) {
+      newSelectedMembers = [
+        ...currentSelected.slice(0, memberIndex),
+        ...currentSelected.slice(memberIndex + 1),
+      ];
+    } else {
+      const memberOption = options.find((opt) => opt.value === memberId);
+      if (memberOption) {
+        newSelectedMembers = [...currentSelected, memberOption];
+      } else {
+        newSelectedMembers = currentSelected;
+      }
+    }
+
+    setSelectedMembers(newSelectedMembers);
+  };
   const aggregatedStats = useMemo(() => {
     if (!stats.length) return null;
 
@@ -236,11 +265,9 @@ export default function DiscordMessageEngagementDashboardPage() {
                 {!areMembersLoading && (
                   <MultiSelect
                     value={selectedMembers}
+                    onChange={setSelectedMembers}
                     options={options}
-                    onChange={(value) => {
-                      setSelectedMembers(value);
-                    }}
-                    label="Select members to view stats for"
+                    label="Select members, or enter a member ID"
                   ></MultiSelect>
                 )}
               </Box>
@@ -347,6 +374,7 @@ export default function DiscordMessageEngagementDashboardPage() {
                         total={total}
                         progress={(total / aggregatedStats.totalMessages) * 100}
                         isSelected={selectedMemberIds.has('' + member.id)}
+                        onToggle={handleToggleMember}
                       />
                     ))}
                 </Stack>
