@@ -178,7 +178,7 @@ export default function DiscordMessageEngagementDashboardPage() {
 
     const memberIndex = currentSelected.findIndex((m) => m.value === memberId);
 
-    let newSelectedMembers;
+    let newSelectedMembers = currentSelected;
     if (memberIndex >= 0) {
       newSelectedMembers = [
         ...currentSelected.slice(0, memberIndex),
@@ -188,8 +188,6 @@ export default function DiscordMessageEngagementDashboardPage() {
       const memberOption = options.find((opt) => opt.value === memberId);
       if (memberOption) {
         newSelectedMembers = [...currentSelected, memberOption];
-      } else {
-        newSelectedMembers = currentSelected;
       }
     }
 
