@@ -20,6 +20,7 @@ import {
   DrawerContent,
   DrawerCloseButton,
 } from '@chakra-ui/react';
+import SWECC_LOGO from '../assets/transp-swecc-logo.png';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { HamburgerIcon } from '@chakra-ui/icons';
 import { Member } from '../types';
@@ -110,49 +111,81 @@ const Navbar: React.FC<NavBarProps> = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const NavLinks = () => (
-    <>
+    <HStack spacing={6} display={{ base: 'none', md: 'flex' }}>
       {isAuthenticated && isVerified && (
-        <>
-          <NavLink to="/directory">Directory</NavLink>
-        </>
+        <NavLink to="/directory">Directory</NavLink>
       )}
       {isAdmin && <NavLink to="/admin">Admin Dashboard</NavLink>}
       {!isAuthenticated && <NavLink to="/join">Join SWECC</NavLink>}
-    </>
+    </HStack>
   );
 
   return (
-    <Box as="nav" boxShadow="sm" position="sticky" top={0} zIndex="sticky">
-      <Container maxW="container.xl" py={4}>
-        <Flex justify="space-between" align="center">
+    <Box
+      as="nav"
+      bg="white"
+      boxShadow="sm"
+      position="sticky"
+      top={0}
+      zIndex="sticky"
+    >
+      <Container maxW="container.xl" py={3}>
+        <Flex justify="space-between" align="center" height="60px">
           <Link to="/">
-            <ChakraLink as="span" _hover={{ textDecoration: 'none' }}>
-              <Text fontSize="2xl" fontWeight="bold" color="blue.500">
-                SWECC
+            <ChakraLink
+              as="span"
+              display="flex"
+              alignItems="center"
+              onClick={onClose}
+              _hover={{ textDecoration: 'none' }}
+            >
+              <Box height="40px" display="flex" alignItems="center">
+                <img
+                  src={SWECC_LOGO}
+                  alt="SWECC Logo"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    filter: 'brightness(0.6) contrast(1.5)',
+                  }}
+                />
+              </Box>
+              <Text
+                fontSize={{ base: 'xl', md: '2xl' }}
+                fontWeight="bold"
+                fontFamily="monospace"
+                ml={4}
+                display={{ base: 'none', md: 'block' }}
+              >
+                <em>Engagement</em>
               </Text>
             </ChakraLink>
           </Link>
 
-          <HStack spacing={8} display={{ base: 'none', md: 'flex' }}>
+          <Flex align="center" gap={4}>
             <NavLinks />
-          </HStack>
 
-          <HStack>
             {member && isAuthenticated ? (
               <Button
                 colorScheme="brand"
                 onClick={() => navigate('/profile')}
                 variant="ghost"
+                size={{ base: 'sm', md: 'md' }}
               >
                 {member.firstName?.length === 0
-                  ? 'Finish setting up your profile'
+                  ? 'Complete Profile'
                   : member.firstName}
               </Button>
             ) : (
-              <Button colorScheme="brand" onClick={() => navigate('/auth')}>
+              <Button
+                colorScheme="brand"
+                onClick={() => navigate('/auth')}
+                size={{ base: 'sm', md: 'md' }}
+              >
                 Sign in
               </Button>
             )}
+
             <IconButton
               display={{ base: 'flex', md: 'none' }}
               colorScheme="brand"
@@ -160,8 +193,9 @@ const Navbar: React.FC<NavBarProps> = ({
               icon={<HamburgerIcon />}
               aria-label="Open menu"
               variant="ghost"
+              size="md"
             />
-          </HStack>
+          </Flex>
         </Flex>
       </Container>
 
@@ -169,10 +203,48 @@ const Navbar: React.FC<NavBarProps> = ({
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Menu</DrawerHeader>
-          <DrawerBody>
-            <VStack align="start" spacing={4}>
-              <NavLinks />
+          <DrawerHeader borderBottomWidth="1px">Menu</DrawerHeader>
+          <DrawerBody pt={4}>
+            <VStack align="stretch" spacing={4}>
+              {isAuthenticated && isVerified && (
+                <Button
+                  variant="ghost"
+                  w="full"
+                  justifyContent="flex-start"
+                  onClick={() => {
+                    navigate('/directory');
+                    onClose();
+                  }}
+                >
+                  Directory
+                </Button>
+              )}
+              {isAdmin && (
+                <Button
+                  variant="ghost"
+                  w="full"
+                  justifyContent="flex-start"
+                  onClick={() => {
+                    navigate('/admin');
+                    onClose();
+                  }}
+                >
+                  Admin Dashboard
+                </Button>
+              )}
+              {!isAuthenticated && (
+                <Button
+                  variant="ghost"
+                  w="full"
+                  justifyContent="flex-start"
+                  onClick={() => {
+                    navigate('/join');
+                    onClose();
+                  }}
+                >
+                  Join SWECC
+                </Button>
+              )}
             </VStack>
           </DrawerBody>
         </DrawerContent>
@@ -186,15 +258,21 @@ const NavLink: React.FC<NavLinkProps> = ({ to, children }) => {
     <Link to={to}>
       <ChakraLink
         as="span"
+        px={3}
+        py={2}
+        rounded="md"
         fontWeight="medium"
-        _hover={{ textDecoration: 'none', color: 'blue.500' }}
+        _hover={{
+          textDecoration: 'none',
+          bg: 'gray.100',
+        }}
+        display="block"
       >
         {children}
       </ChakraLink>
     </Link>
   );
 };
-
 const Footer: React.FC = () => {
   const bg = useColorModeValue('gray.50', 'gray.900');
   const color = useColorModeValue('gray.700', 'gray.200');
