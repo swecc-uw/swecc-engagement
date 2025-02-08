@@ -127,6 +127,21 @@ export default function AdminDashboard() {
         to: '/admin/discord',
       },
     },
+    {
+      title: 'Manage Cohorts',
+      description: 'View and manage cohorts',
+      icon: List,
+      primaryAction: {
+        label: 'View Cohorts',
+        to: '/admin/cohorts',
+      },
+      secondaryActions: [
+        {
+          label: 'Create Cohort',
+          to: '/admin/cohorts/create',
+        },
+      ],
+    },
   ];
 
   return (

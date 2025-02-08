@@ -300,6 +300,25 @@ export interface StatsResponseRecord {
   stats: DiscordMessageStats;
 }
 
+export interface CohortView {
+  id: number;
+  name: string;
+  members: Member[];
+}
+
+export interface CohortCreate {
+  name: string;
+  memberIds: number[];
+}
+
+export interface CohortUpdate {
+  id: number;
+  name: string;
+  memberIds: number[];
+}
+
+export type CohortFormData = Omit<CohortCreate, 'id'>;
+
 interface RawDiscordChannel {
   channel_id: number;
   channel_name?: string;
