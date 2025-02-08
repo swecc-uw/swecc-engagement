@@ -20,6 +20,8 @@ import { AdminEngagementPage } from './pages/admin/AdminEngagementPage';
 import APIClient from './pages/admin/APIClient';
 import DiscordMessageEngagementDashboardPage from './pages/admin/DiscordMessageEngagementDashboardPage';
 import AdminSessionPage from './pages/admin/AdminSessionPage';
+import CohortDashboard from './pages/admin/CohortDashboard';
+import CreateUpdateCohortPage from './pages/admin/CreateUpdateCohortPage';
 
 const App: React.FC = () => {
   return (
@@ -131,6 +133,15 @@ const App: React.FC = () => {
               }
             />
             <Route path="/admin/sessions" element={<AdminSessionPage />} />
+            <Route path="/admin/cohorts" element={<CohortDashboard />} />
+            <Route
+              path="/admin/cohorts/edit/:id"
+              element={<CreateUpdateCohortPage />}
+            />
+            <Route
+              path="/admin/cohorts/create"
+              element={<CreateUpdateCohortPage />}
+            />
           </Routes>
         </Layout>
       </HashRouter>
