@@ -53,3 +53,15 @@ export async function deleteCohort(cohortId: number): Promise<boolean> {
   const response = await api.delete(`/cohorts/${cohortId}/`);
   return response.status === 204;
 }
+
+export async function removeFromCohort(
+  cohortId: number,
+  memberId: number
+): Promise<boolean> {
+  const response = await api.post(`/cohorts/remove/`, {
+    member_id: memberId,
+    cohort_id: cohortId,
+  });
+
+  return response.status === 200;
+}

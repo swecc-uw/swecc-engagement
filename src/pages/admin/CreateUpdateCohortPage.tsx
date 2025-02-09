@@ -18,6 +18,7 @@ import {
   SearchBar,
   MemberSelection,
 } from '../../components/MemberSelectionUtils';
+import { removeFromCohort } from '../../services/cohort';
 
 export default function CreateUpdateCohortPage() {
   const { id: cohortId } = useParams();
@@ -44,6 +45,11 @@ export default function CreateUpdateCohortPage() {
       </Container>
     );
   }
+
+  const handleRemoval = async (memberId: number) => {
+    await removeFromCohort(parseInt(cohortId!), memberId);
+    toggleMember(memberId);
+  };
 
   return (
     <Container maxW="container.lg" py={8}>
@@ -84,6 +90,13 @@ export default function CreateUpdateCohortPage() {
                 selectedIds={formState.memberIds}
                 onToggle={toggleMember}
                 isLoading={memberState.isLoading}
+                onDelete={(memberId) => {
+                  const answer = window.confirm(
+                    'Are you sure you want to delete this member from this cohort?'
+                  );
+                  if (!answer) return;
+                  handleRemoval(memberId);
+                }}
               />
             </Box>
 
@@ -102,7 +115,8 @@ export default function CreateUpdateCohortPage() {
                 colorScheme="blue"
                 isLoading={formState.isSaving}
                 isDisabled={
-                  !formState.name.trim() || formState.memberIds.length === 0
+                  !isEditMode &&
+                  (!formState.name.trim() || formState.memberIds.length === 0)
                 }
               >
                 {isEditMode ? 'Update Cohort' : 'Create Cohort'}
