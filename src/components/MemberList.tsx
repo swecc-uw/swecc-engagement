@@ -35,9 +35,16 @@ interface MemberListProps {
   totalPages?: number;
   showPagination?: boolean;
   onPageChange?: (page: number) => void;
+  actionElement?: (member: Member) => React.ReactNode;
 }
 
-const MemberCard = ({ member }: { member: Member }) => {
+const MemberCard = ({
+  member,
+  actionElement,
+}: {
+  member: Member;
+  actionElement?: (member: Member) => React.ReactNode;
+}) => {
   const bgColor = 'white';
   const borderColor = 'gray.100';
   const textColor = 'gray.600';
@@ -204,6 +211,7 @@ const MemberCard = ({ member }: { member: Member }) => {
               ))}
             </HStack>
           </Flex>
+          {actionElement && <Box mt={4}>{actionElement(member)}</Box>}
         </Box>
       </Flex>
     </Box>
@@ -247,6 +255,7 @@ const MemberList: React.FC<MemberListProps> = ({
   totalPages = 1,
   showPagination = true,
   onPageChange,
+  actionElement,
 }) => {
   const skeletonCount = loading ? Math.max(members.length, 3) : 0;
 
@@ -261,7 +270,11 @@ const MemberList: React.FC<MemberListProps> = ({
       ) : members.length > 0 ? (
         <VStack spacing={4} align="stretch">
           {members.map((member) => (
-            <MemberCard key={member.id} member={member} />
+            <MemberCard
+              key={member.id}
+              member={member}
+              actionElement={actionElement}
+            />
           ))}
         </VStack>
       ) : (
