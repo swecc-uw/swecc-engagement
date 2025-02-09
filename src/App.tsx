@@ -22,6 +22,7 @@ import DiscordMessageEngagementDashboardPage from './pages/admin/DiscordMessageE
 import AdminSessionPage from './pages/admin/AdminSessionPage';
 import CohortDashboard from './pages/admin/CohortDashboard';
 import CreateUpdateCohortPage from './pages/admin/CreateUpdateCohortPage';
+import BulkCohortUploadPage from './pages/admin/BulkCohortUploadPage';
 
 const App: React.FC = () => {
   return (
@@ -141,6 +142,10 @@ const App: React.FC = () => {
             <Route
               path="/admin/cohorts/create"
               element={<CreateUpdateCohortPage />}
+            />
+            <Route
+              path="/admin/cohorts/upload"
+              element={<BulkCohortUploadPage />}
             />
           </Routes>
         </Layout>

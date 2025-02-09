@@ -309,6 +309,7 @@ export interface CohortView {
 export interface CohortCreate {
   name: string;
   memberIds: number[];
+  level?: string;
 }
 
 export interface CohortUpdate {

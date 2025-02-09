@@ -140,6 +140,10 @@ export default function AdminDashboard() {
           label: 'Create Cohort',
           to: '/admin/cohorts/create',
         },
+        {
+          label: 'Bulk Cohort Upload',
+          to: '/admin/cohorts/upload',
+        },
       ],
     },
   ];
