@@ -58,7 +58,7 @@ export async function removeFromCohort(
   cohortId: number,
   memberId: number
 ): Promise<boolean> {
-  const response = await api.post(`/cohorts/remove/`, {
+  const response = await api.post('/cohorts/remove/', {
     member_id: memberId,
     cohort_id: cohortId,
   });
