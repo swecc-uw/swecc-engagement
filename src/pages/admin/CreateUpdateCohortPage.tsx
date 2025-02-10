@@ -18,7 +18,7 @@ import {
   SearchBar,
   MemberSelection,
 } from '../../components/MemberSelectionUtils';
-import { removeFromCohort } from '../../services/cohort';
+import { removeFromCohort, transferToChort } from '../../services/cohort';
 
 export default function CreateUpdateCohortPage() {
   const { id: cohortId } = useParams();
@@ -49,6 +49,15 @@ export default function CreateUpdateCohortPage() {
   const handleRemoval = async (memberId: number) => {
     await removeFromCohort(parseInt(cohortId!), memberId);
     toggleMember(memberId);
+  };
+
+  // I know this looks hella weird but it's pretty clean I think
+  const onTransfer = (cohortId: number) => {
+    return (memberId: number) => {
+      return async (toCohort: number) => {
+        await transferToChort(cohortId, toCohort, memberId);
+      };
+    };
   };
 
   return (
@@ -97,6 +106,7 @@ export default function CreateUpdateCohortPage() {
                   if (!answer) return;
                   handleRemoval(memberId);
                 }}
+                onTransfer={onTransfer(parseInt(cohortId!))}
               />
             </Box>
 

@@ -1,5 +1,5 @@
 // Components.tsx
-import { Member } from '../types';
+import { CohortView, Member } from '../types';
 import {
   VStack,
   HStack,
@@ -11,14 +11,29 @@ import {
   Spinner,
   IconButton,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure,
+  useToast,
+  Select,
+  Heading,
 } from '@chakra-ui/react';
 import { RefreshCw } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { getCohorts, transferToChort } from '../services/cohort';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface MemberViewProps {
   member: Member;
   isSelected: boolean;
   onToggle: (id: number) => void;
   onDelete: (id: number) => void;
+  onTransfer: (memberId: number) => (toCohort: number) => Promise<void>;
 }
 
 export const MemberView: React.FC<MemberViewProps> = ({
@@ -26,6 +41,7 @@ export const MemberView: React.FC<MemberViewProps> = ({
   isSelected,
   onToggle,
   onDelete,
+  onTransfer,
 }) => (
   <Card variant="outline" bg={isSelected ? 'blue.50' : 'white'}>
     <CardBody>
@@ -48,15 +64,18 @@ export const MemberView: React.FC<MemberViewProps> = ({
             {isSelected ? 'Remove' : 'Add'}
           </Button>
           {isSelected && (
-            <Button
-              onClick={() => {
-                onDelete(member.id);
-              }}
-              w="100%"
-              size="sm"
-            >
-              Delete
-            </Button>
+            <>
+              <Button
+                onClick={() => {
+                  onDelete(member.id);
+                }}
+                w="100%"
+                size="sm"
+              >
+                Delete
+              </Button>
+              <TransferCohortButton onTransfer={onTransfer(member.id)} />
+            </>
           )}
         </VStack>
       </HStack>
@@ -70,6 +89,7 @@ interface MemberSelectionProps {
   onToggle: (id: number) => void;
   onDelete: (id: number) => void;
   isLoading: boolean;
+  onTransfer: (memberId: number) => (toCohort: number) => Promise<void>;
 }
 
 export const MemberSelection: React.FC<MemberSelectionProps> = ({
@@ -78,6 +98,7 @@ export const MemberSelection: React.FC<MemberSelectionProps> = ({
   onToggle,
   isLoading,
   onDelete,
+  onTransfer,
 }) => {
   if (isLoading) {
     return (
@@ -105,6 +126,7 @@ export const MemberSelection: React.FC<MemberSelectionProps> = ({
           isSelected={selectedIds.includes(member.id)}
           onToggle={onToggle}
           onDelete={onDelete}
+          onTransfer={onTransfer}
         />
       ))}
     </VStack>
@@ -139,3 +161,86 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     />
   </HStack>
 );
+
+interface TransferCohortButtonProps {
+  onTransfer: (toCohort: number) => Promise<void>;
+}
+
+const TransferCohortButton: React.FC<TransferCohortButtonProps> = ({
+  onTransfer,
+}) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const [cohorts, setCohorts] = useState<CohortView[]>([]);
+  const selectionRef = useRef<HTMLSelectElement>(null);
+
+  const toast = useToast();
+  const navigate = useNavigate();
+
+  const loadCohorts = async () => {
+    try {
+      setCohorts(await getCohorts());
+    } catch (error) {
+      toast({
+        title: 'Failed to load cohorts',
+        status: 'error',
+        duration: 3000,
+        description: (error as Error).message,
+      });
+    }
+  };
+
+  const submit = async () => {
+    await onTransfer(parseInt(selectionRef.current!.value));
+    // Refresh page
+    navigate(0);
+  };
+
+  useEffect(() => {
+    loadCohorts();
+  }, []);
+
+  return (
+    <>
+      <Button colorScheme="blue" onClick={onOpen}>
+        Transfer Cohort
+      </Button>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Transfer Cohort</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Heading fontSize="medium" mb={2}>
+              Select Cohort
+            </Heading>
+            <Select ref={selectionRef}>
+              {cohorts.map((cohort, idx) => {
+                return (
+                  <option value={cohort.id} key={idx}>
+                    {cohort.name}
+                  </option>
+                );
+              })}
+            </Select>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
+              Close
+            </Button>
+            <Button
+              backgroundColor="green.500"
+              color="white"
+              _hover={{ bg: 'green.600' }}
+              onClick={() => {
+                submit();
+              }}
+            >
+              Submit
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+};
