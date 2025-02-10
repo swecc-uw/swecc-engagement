@@ -18,12 +18,14 @@ interface MemberViewProps {
   member: Member;
   isSelected: boolean;
   onToggle: (id: number) => void;
+  onDelete: (id: number) => void;
 }
 
 export const MemberView: React.FC<MemberViewProps> = ({
   member,
   isSelected,
   onToggle,
+  onDelete,
 }) => (
   <Card variant="outline" bg={isSelected ? 'blue.50' : 'white'}>
     <CardBody>
@@ -36,13 +38,27 @@ export const MemberView: React.FC<MemberViewProps> = ({
             @{member.username}
           </Text>
         </VStack>
-        <Button
-          size="sm"
-          colorScheme={isSelected ? 'red' : 'blue'}
-          onClick={() => onToggle(member.id)}
-        >
-          {isSelected ? 'Remove' : 'Add'}
-        </Button>
+        <VStack>
+          <Button
+            size="sm"
+            colorScheme={isSelected ? 'red' : 'blue'}
+            onClick={() => onToggle(member.id)}
+            w="100%"
+          >
+            {isSelected ? 'Remove' : 'Add'}
+          </Button>
+          {isSelected && (
+            <Button
+              onClick={() => {
+                onDelete(member.id);
+              }}
+              w="100%"
+              size="sm"
+            >
+              Delete
+            </Button>
+          )}
+        </VStack>
       </HStack>
     </CardBody>
   </Card>
@@ -52,6 +68,7 @@ interface MemberSelectionProps {
   members: Member[];
   selectedIds: number[];
   onToggle: (id: number) => void;
+  onDelete: (id: number) => void;
   isLoading: boolean;
 }
 
@@ -60,6 +77,7 @@ export const MemberSelection: React.FC<MemberSelectionProps> = ({
   selectedIds,
   onToggle,
   isLoading,
+  onDelete,
 }) => {
   if (isLoading) {
     return (
@@ -86,6 +104,7 @@ export const MemberSelection: React.FC<MemberSelectionProps> = ({
           member={member}
           isSelected={selectedIds.includes(member.id)}
           onToggle={onToggle}
+          onDelete={onDelete}
         />
       ))}
     </VStack>
