@@ -25,8 +25,8 @@ import {
 } from '@chakra-ui/react';
 import { RefreshCw } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { getCohorts, transferToChort } from '../services/cohort';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { getCohorts } from '../services/cohort';
+import { useNavigate } from 'react-router-dom';
 
 interface MemberViewProps {
   member: Member;

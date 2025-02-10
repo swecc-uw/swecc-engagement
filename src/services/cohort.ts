@@ -66,7 +66,7 @@ export async function removeFromCohort(
   return response.status === 200;
 }
 
-export async function transferToChort(
+export async function transferToCohort(
   fromCohortId: number,
   toCohortId: number,
   memberId: number
