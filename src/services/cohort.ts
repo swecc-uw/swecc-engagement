@@ -65,3 +65,17 @@ export async function removeFromCohort(
 
   return response.status === 200;
 }
+
+export async function transferToCohort(
+  fromCohortId: number,
+  toCohortId: number,
+  memberId: number
+): Promise<boolean> {
+  const response = await api.post('/cohorts/transfer/', {
+    member_id: memberId,
+    from_cohort_id: fromCohortId,
+    to_cohort_id: toCohortId,
+  });
+
+  return response.status === 200;
+}

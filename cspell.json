@@ -1,24 +1,18 @@
 {
-    "version": "0.1",
-    "language": "en",
-    "words": [
-        "Leetcode",
-        "swecc",
-        "chakra",
-        "csrftoken",
-        "Chakara",
-        "elimelt",
-        "Glassdoor",
-        "Formik",
-        "kwargs",
-        "metasync",
-    ],
-    "ignorePaths": [
-        "node_modules/**",
-        "dist/**",
-        "build/**"
-    ],
-    "files": [
-        "src/**/*.{tsx,ts,html,md}"
-    ]
+  "version": "0.1",
+  "language": "en",
+  "words": [
+    "Leetcode",
+    "swecc",
+    "chakra",
+    "csrftoken",
+    "Chakara",
+    "elimelt",
+    "Glassdoor",
+    "Formik",
+    "kwargs",
+    "metasync"
+  ],
+  "ignorePaths": ["node_modules/**", "dist/**", "build/**"],
+  "files": ["src/**/*.{tsx,ts,html,md}"]
 }
