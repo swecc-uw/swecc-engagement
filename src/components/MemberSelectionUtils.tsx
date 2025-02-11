@@ -74,7 +74,7 @@ export const MemberView: React.FC<MemberViewProps> = ({
               >
                 Delete
               </Button>
-              <TransferCohortButton onTransfer={onTransfer(member.id)} />
+              <TransferCohortModal onTransfer={onTransfer(member.id)} />
             </>
           )}
         </VStack>
@@ -162,11 +162,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   </HStack>
 );
 
-interface TransferCohortButtonProps {
+interface TransferCohortModalProps {
   onTransfer: (toCohort: number) => Promise<void>;
 }
 
-const TransferCohortButton: React.FC<TransferCohortButtonProps> = ({
+const TransferCohortModal: React.FC<TransferCohortModalProps> = ({
   onTransfer,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
