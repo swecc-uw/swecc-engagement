@@ -289,6 +289,13 @@ export interface AttendanceSession {
 }
 
 export type DiscordMessageStats = Record<string, number>;
+export type LeetcodeStats = Record<string, number>;
+export type GithubStats = Record<string, number>;
+
+export interface UserStats {
+  leetcode: LeetcodeStats;
+  github: GithubStats;
+}
 
 export interface RawStatsResponseRecord {
   member: RawMemberData;

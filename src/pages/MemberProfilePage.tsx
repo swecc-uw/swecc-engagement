@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import MemberProfileEdit from '../components/MemberProfileEdit';
 import MemberProfileView from '../components/MemberProfileView';
 import { useAuth } from '../hooks/useAuth';
-import { Member } from '../types';
+import { GithubStats, LeetcodeStats, Member } from '../types';
 import {
   Box,
   Button,
@@ -24,8 +24,8 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import LeetcodeProfile from '../components/LeetcodeProfile';
-import GitHubCalendar, { Activity, ThemeInput } from 'react-github-calendar';
 import { updateMemberProfile } from '../services/member';
+import { getUserStats } from '../services/engagement';
 import { devPrint } from '../components/utils/RandomUtils';
 import {
   FaEdit,
@@ -35,26 +35,7 @@ import {
   FaChartBar,
   FaUser,
 } from 'react-icons/fa';
-import { getToday } from '../localization';
-
-const selectLastHalfYear = (contributions: Activity[]) => {
-  const today = getToday();
-  const currentYear = today.getUTCFullYear();
-  const currentMonth = today.getUTCMonth();
-  const shownMonths = 6;
-
-  return contributions.filter((activity) => {
-    const date = new Date(activity.date);
-    const monthOfDay = date.getUTCMonth();
-
-    return (
-      date.getUTCFullYear() === currentYear &&
-      monthOfDay > currentMonth - shownMonths &&
-      monthOfDay <= currentMonth
-    );
-  });
-};
-
+import GitHubProfile from '../components/GithubProfile';
 interface WidgetCardProps {
   icon: As;
   title: string;
@@ -89,26 +70,27 @@ const WidgetCard: React.FC<WidgetCardProps> = ({ icon, title, children }) => {
 };
 
 const Widgets: React.FC<{ member: Member }> = ({ member }) => {
-  const [isGithubLoading, setIsGithubLoading] = useState(true);
   const chartBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
-
-  const githubTheme: ThemeInput = {
-    dark: ['#f0f0f0', '#dcd0ff', '#c4a3ff', '#a876ff', '#8a00d4'],
-    light: ['#333333', '#62419d', '#7139bf', '#822df2', '#8a00d4'],
-  };
+  const [githubStats, setGithubStats] = useState<GithubStats>();
+  const [leetcodeStats, setLeetcodeStats] = useState<LeetcodeStats>();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const delay6s = setTimeout(() => {
-      setIsGithubLoading(false);
-    }, 6000);
-
-    return () => clearTimeout(delay6s);
-  }, []);
-
-  if (!member.github && !member.leetcode) {
-    return null;
-  }
+    if (member.github || member.leetcode) {
+      getUserStats(member.id)
+        .then((stats) => {
+          setGithubStats(stats.github);
+          setLeetcodeStats(stats.leetcode);
+        })
+        .catch((error) => {
+          devPrint('Error fetching user stats:', error);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [member]);
 
   return (
     <Card
@@ -135,27 +117,34 @@ const Widgets: React.FC<{ member: Member }> = ({ member }) => {
           w="full"
           align="stretch"
         >
-          {member.leetcode && (
+          {member.leetcode && leetcodeStats && (
             <Box flex="1">
               <WidgetCard icon={FaCode} title="LeetCode Stats">
-                <LeetcodeProfile username={member.leetcode.username} />
+                <LeetcodeProfile
+                  username={member.leetcode.username}
+                  stats={{
+                    easy: leetcodeStats['easy_solved'],
+                    medium: leetcodeStats['medium_solved'],
+                    hard: leetcodeStats['hard_solved'],
+                  }}
+                  loading={isLoading}
+                />
               </WidgetCard>
             </Box>
           )}
-          {member.github && (
+          {member.github && githubStats && (
             <Box flex="1">
               <WidgetCard icon={FaGithub} title="GitHub Contributions">
-                <Skeleton isLoaded={!isGithubLoading} borderRadius="lg">
+                <Skeleton isLoaded={!isLoading}>
                   <Box bg={chartBg} p={4} borderRadius="lg" overflowX="auto">
-                    <GitHubCalendar
+                    <GitHubProfile
                       username={member.github.username}
-                      transformData={selectLastHalfYear}
-                      theme={githubTheme}
-                      year={new Date().getFullYear()}
-                      labels={{
-                        totalCount:
-                          '{{count}} contributions in the last 6 months',
+                      stats={{
+                        prs: githubStats['total_prs'],
+                        commits: githubStats['total_commits'],
+                        followers: githubStats['followers'],
                       }}
+                      loading={isLoading}
                     />
                   </Box>
                 </Skeleton>

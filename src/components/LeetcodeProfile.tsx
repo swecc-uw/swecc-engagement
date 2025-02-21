@@ -1,103 +1,107 @@
-import { useEffect, useState, useMemo } from 'react';
 import {
   Box,
   Link,
   Text,
-  VStack,
   Heading,
   Spinner,
-  Center,
+  Grid,
+  Flex,
   useColorModeValue,
+  IconButton,
+  Stat,
+  StatLabel,
+  StatNumber,
 } from '@chakra-ui/react';
-import { devPrint } from './utils/RandomUtils';
-import { LEETCODE_API_BASE_URL } from '../constants';
+import { FaExternalLinkAlt } from 'react-icons/fa';
 
-type LeetcodeProfileProps = {
+type LeetCodeStatsProps = {
   username: string;
+  stats: {
+    easy: number;
+    medium: number;
+    hard: number;
+  };
+  loading?: boolean;
 };
 
-type Stats = {
-  easy: number;
-  medium: number;
-  hard: number;
-};
-
-const LeetcodeProfile = ({ username }: LeetcodeProfileProps) => {
-  const [submissions, setSubmissions] = useState<Stats>();
-  const [loading, setLoading] = useState(true);
-
-  const profileCache: Record<string, Stats> = useMemo(() => ({}), []);
-
-  useEffect(() => {
-    if (profileCache[username]) {
-      setSubmissions(profileCache[username]);
-      setLoading(false);
-    } else {
-      setLoading(true);
-      const fetchProfile = async () => {
-        try {
-          const response = await fetch(
-            `${LEETCODE_API_BASE_URL}${username}/solved`
-          );
-          const data = await response.json();
-          const {
-            easySolved: easy,
-            mediumSolved: medium,
-            hardSolved: hard,
-          } = data;
-          const stats = { easy, medium, hard };
-          profileCache[username] = stats;
-          setSubmissions(stats);
-        } catch (error) {
-          devPrint(error);
-          setSubmissions({ easy: 0, medium: 0, hard: 0 });
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchProfile();
-    }
-  }, [username, profileCache]);
+export const LeetCodeProfile = ({
+  username,
+  stats,
+  loading = false,
+}: LeetCodeStatsProps) => {
+  const statBg = useColorModeValue('gray.50', 'gray.700');
 
   const easyColor = useColorModeValue('green.500', 'green.300');
   const mediumColor = useColorModeValue('orange.500', 'orange.300');
   const hardColor = useColorModeValue('red.500', 'red.300');
-  const totalColor = useColorModeValue('orange.500', 'orange.300');
 
-  return loading ? (
-    <Box display="flex" justifyContent="center" alignItems="center">
-      <Spinner />
-    </Box>
-  ) : (
-    <Box p={6} textAlign="center">
-      {submissions === undefined ? (
-        <Center>
-          <Spinner />
-        </Center>
-      ) : (
-        <VStack spacing={1}>
-          <Heading as="h3" size="lg">
-            <Link href={`${LEETCODE_API_BASE_URL}${username}`} isExternal>
-              {username}&apos;s profile
-            </Link>
-          </Heading>
-          <Text fontSize="xl" fontWeight="bold" color={totalColor}>
-            Total: {submissions.easy + submissions.medium + submissions.hard}
+  const total = stats.easy + stats.medium + stats.hard;
+
+  const metrics = [
+    {
+      label: 'Easy',
+      value: stats.easy,
+      color: easyColor,
+    },
+    {
+      label: 'Medium',
+      value: stats.medium,
+      color: mediumColor,
+    },
+    {
+      label: 'Hard',
+      value: stats.hard,
+      color: hardColor,
+    },
+  ];
+
+  if (loading)
+    return (
+      <Flex justify="center" align="center" p={12}>
+        <Spinner size="xl" />
+      </Flex>
+    );
+
+  return (
+    <Box p={6}>
+      <Flex justify="space-between" align="center" mb={6}>
+        <Heading size="lg">{username}&apos;s LeetCode</Heading>
+        <Flex align="center" gap={4}>
+          <Text fontSize="lg" fontWeight="bold">
+            Total: {total}
           </Text>
-          <Text fontSize="lg" color={easyColor}>
-            Easy: {submissions.easy}
-          </Text>
-          <Text fontSize="lg" color={mediumColor}>
-            Medium: {submissions.medium}
-          </Text>
-          <Text fontSize="lg" color={hardColor}>
-            Hard: {submissions.hard}
-          </Text>
-        </VStack>
-      )}
+          <Link href={`https://leetcode.com/${username}`} isExternal>
+            <IconButton
+              aria-label="External link"
+              icon={<FaExternalLinkAlt />}
+              size="sm"
+              variant="ghost"
+            />
+          </Link>
+        </Flex>
+      </Flex>
+
+      <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={4}>
+        {metrics.map((metric) => (
+          <Stat
+            key={metric.label}
+            px={4}
+            py={6}
+            bg={statBg}
+            borderRadius="lg"
+            textAlign="center"
+            transition="transform 0.2s"
+            _hover={{ transform: 'scale(1.02)' }}
+          >
+            <StatNumber fontSize="2xl" fontWeight="bold" color={metric.color}>
+              {metric.value}
+            </StatNumber>
+            <StatLabel>{metric.label}</StatLabel>
+          </Stat>
+        ))}
+      </Grid>
     </Box>
   );
 };
 
-export default LeetcodeProfile;
+export default LeetCodeProfile;
