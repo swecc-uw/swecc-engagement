@@ -79,3 +79,13 @@ export async function transferToCohort(
 
   return response.status === 200;
 }
+
+export function getCohortStats() {
+  return api
+    .get('cohorts/stats?include_profiles=true&include_individuals=true')
+    .then((res) => res.data)
+    .catch((err) => {
+      console.error(err);
+      return null;
+    });
+}

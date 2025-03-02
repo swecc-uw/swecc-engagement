@@ -15,6 +15,7 @@ import {
 import { CalendarIcon, StarIcon, TriangleUpIcon } from '@chakra-ui/icons';
 
 import api from '../services/api';
+import { getCohortStats } from '../services/cohort';
 
 const CohortStatsDashboard = () => {
   // State for dashboard data
@@ -44,17 +45,10 @@ const CohortStatsDashboard = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = api.get(
-          'cohorts/stats?include_profiles=true&include_individuals=true'
-        );
 
-        const data = (await response
-          .then((res) => res.data)
-          .catch((err) => {
-            throw err;
-          })) as any[];
+        const data = await getCohortStats();
 
-        // Use the first cohort's stats or default to empty if no data
+        // TODO: we should support multiple components
         if (data && data.length > 0 && data[0].stats) {
           setStats(data[0].stats);
         }
