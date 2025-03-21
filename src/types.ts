@@ -313,6 +313,19 @@ export interface CohortView {
   members: Member[];
 }
 
+export interface CohortDetails {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  status: 'ACTIVE' | 'COMPLETED' | 'PLANNED';
+  students?: {
+    id: string;
+    name: string;
+    email: string;
+  }[];
+}
+
 export interface CohortCreate {
   name: string;
   memberIds: number[];
