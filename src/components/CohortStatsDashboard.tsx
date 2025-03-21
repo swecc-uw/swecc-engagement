@@ -151,14 +151,20 @@ const CohortSelectionBar = ({
           variant={selectedCohortId === 'all' ? 'solid' : 'ghost'}
           onClick={() => onCohortSelect('all')}
           size="md"
-          borderRadius="full"
+          borderRadius="md"
           px={6}
           _active={{
-            transform: 'scale(0.95)',
+            opacity: 0.8,
           }}
-          fontWeight={selectedCohortId === 'all' ? 'bold' : 'medium'}
+          _hover={{
+            bg: selectedCohortId === 'all' ? 'blue.600' : 'blue.50',
+          }}
+          transition="all 0.2s"
+          fontWeight="bold"
         >
-          All Cohorts
+          <Text as="span" opacity={selectedCohortId === 'all' ? 1 : 0.8}>
+            All Cohorts
+          </Text>
         </Button>
       </WrapItem>
       {cohorts.map((cohort) => (
@@ -168,14 +174,20 @@ const CohortSelectionBar = ({
             variant={selectedCohortId === cohort.id.toString() ? 'solid' : 'ghost'}
             onClick={() => onCohortSelect(cohort.id.toString())}
             size="md"
-            borderRadius="full"
+            borderRadius="md"
             px={6}
             _active={{
-              transform: 'scale(0.95)',
+              opacity: 0.8,
             }}
-            fontWeight={selectedCohortId === cohort.id.toString() ? 'bold' : 'medium'}
+            _hover={{
+              bg: selectedCohortId === cohort.id.toString() ? 'blue.600' : 'blue.50',
+            }}
+            transition="all 0.2s"
+            fontWeight="bold"
           >
-            {cohort.name}
+            <Text as="span" opacity={selectedCohortId === cohort.id.toString() ? 1 : 0.8}>
+              {cohort.name}
+            </Text>
             <Badge 
               ml={2} 
               colorScheme="blue"
