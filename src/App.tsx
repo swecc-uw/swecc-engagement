@@ -149,7 +149,7 @@ const App: React.FC = () => {
               element={<BulkCohortUploadPage />}
             />
             <Route
-              path="/stats"
+              path="/cohorts"
               element={
                 <ProtectedRoute>
                   <CohortStatsDashboard />

@@ -115,7 +115,7 @@ const Navbar: React.FC<NavBarProps> = ({
       {isAuthenticated && isVerified && (
         <>
           <NavLink to="/directory">Directory</NavLink>
-          <NavLink to="/stats">Stats</NavLink>
+          <NavLink to="/cohorts">Cohorts</NavLink>
         </>
       )}
       {isAdmin && <NavLink to="/admin">Admin Dashboard</NavLink>}
@@ -227,11 +227,11 @@ const Navbar: React.FC<NavBarProps> = ({
                     w="full"
                     justifyContent="flex-start"
                     onClick={() => {
-                      navigate('/stats');
+                      navigate('/cohorts');
                       onClose();
                     }}
                   >
-                    Stats
+                    Cohorts
                   </Button>
                 </>
               )}
