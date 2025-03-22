@@ -252,6 +252,8 @@ const CohortDashboardLayout = ({
 const CohortStatsDashboard = () => {
   const { member } = useAuth();
   const bgColor = useColorModeValue('gray.50', 'gray.600');
+  const ringsBgColor = useColorModeValue('gray.50', 'gray.700');
+  
   const initialStats = {
     applications: 0,
     onlineAssessments: 0,
@@ -506,7 +508,7 @@ const CohortStatsDashboard = () => {
                         align="center" 
                         p={2} 
                         borderRadius="md"
-                        bg={useColorModeValue('gray.50', 'gray.700')}
+                        bg={ringsBgColor}
                       >
                         <Box w="4" h="4" borderRadius="full" mr={3} bg={ring.color} />
                         <Text fontSize="sm" fontWeight="medium">{ring.name}</Text>
