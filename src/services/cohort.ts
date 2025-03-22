@@ -79,3 +79,19 @@ export async function transferToCohort(
 
   return response.status === 200;
 }
+
+export function getCohortStats(cohortId?: string) {
+  const params = new URLSearchParams({
+    include_profiles: 'true',
+    include_individuals: 'true',
+    ...(cohortId && { cohort_id: cohortId })
+  });
+  
+  return api
+    .get(`cohorts/stats/?${params}`)
+    .then((res) => res.data)
+    .catch((err) => {
+      console.error(err);
+      return null;
+    });
+}

@@ -113,7 +113,10 @@ const Navbar: React.FC<NavBarProps> = ({
   const NavLinks = () => (
     <HStack spacing={6} display={{ base: 'none', md: 'flex' }}>
       {isAuthenticated && isVerified && (
-        <NavLink to="/directory">Directory</NavLink>
+        <>
+          <NavLink to="/directory">Directory</NavLink>
+          <NavLink to="/cohorts">Cohorts</NavLink>
+        </>
       )}
       {isAdmin && <NavLink to="/admin">Admin Dashboard</NavLink>}
       {!isAuthenticated && <NavLink to="/join">Join SWECC</NavLink>}
@@ -207,17 +210,30 @@ const Navbar: React.FC<NavBarProps> = ({
           <DrawerBody pt={4}>
             <VStack align="stretch" spacing={4}>
               {isAuthenticated && isVerified && (
-                <Button
-                  variant="ghost"
-                  w="full"
-                  justifyContent="flex-start"
-                  onClick={() => {
-                    navigate('/directory');
-                    onClose();
-                  }}
-                >
-                  Directory
-                </Button>
+                <>
+                  <Button
+                    variant="ghost"
+                    w="full"
+                    justifyContent="flex-start"
+                    onClick={() => {
+                      navigate('/directory');
+                      onClose();
+                    }}
+                  >
+                    Directory
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    w="full"
+                    justifyContent="flex-start"
+                    onClick={() => {
+                      navigate('/cohorts');
+                      onClose();
+                    }}
+                  >
+                    Cohorts
+                  </Button>
+                </>
               )}
               {isAdmin && (
                 <Button
