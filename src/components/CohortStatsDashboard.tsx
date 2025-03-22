@@ -152,7 +152,6 @@ const FitnessRings = ({
 // Cohort Selection Bar Component
 const CohortSelectionBar = ({
   cohorts,
-  allCohorts,
   selectedCohortId,
   onCohortSelect,
 }: {
@@ -249,20 +248,33 @@ const CohortDashboardLayout = ({
   </Box>
 );
 
-const CohortStatsDashboard = () => {
-  const { member } = useAuth();
-  const bgColor = useColorModeValue('gray.50', 'gray.600');
-  const ringsBgColor = useColorModeValue('gray.50', 'gray.700');
-  
-  const initialStats = {
-    applications: 0,
-    onlineAssessments: 0,
-    interviews: 0,
-    offers: 0,
-    dailyChecks: 0,
-    streak: 0,
-  };
+const initialStats = {
+  applications: 0,
+  onlineAssessments: 0,
+  interviews: 0,
+  offers: 0,
+  dailyChecks: 0,
+  streak: 0,
+};
 
+interface CohortStatsHookResult {
+  stats: typeof initialStats;
+  averageStats: typeof initialStats;
+  allCohorts: CohortView[];
+  userCohorts: CohortView[];
+  selectedCohortId: string;
+  loading: boolean;
+  error: string | null;
+  setSelectedCohortId: (id: string) => void;
+  conversionRates: {
+    assessmentRate: string;
+    interviewRate: string;
+    offerRate: string;
+    overallRate: string;
+  };
+}
+
+const useCohortStats = (memberId?: number): CohortStatsHookResult => {
   const [stats, setStats] = useState(initialStats);
   const [averageStats, setAverageStats] = useState(initialStats);
   const [{ allCohorts, userCohorts }, setCohortsData] = useState<{
@@ -272,15 +284,7 @@ const CohortStatsDashboard = () => {
   const [selectedCohortId, setSelectedCohortId] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tooltip, setTooltip] = useState<TooltipState>({
-    show: false,
-    content: '',
-    x: 0,
-    y: 0,
-    width: 0,
-  });
 
-  // Calculate conversion rates
   const conversionRates = {
     assessmentRate: stats.applications > 0
       ? ((stats.onlineAssessments / stats.applications) * 100).toFixed(1)
@@ -296,7 +300,6 @@ const CohortStatsDashboard = () => {
       : '0',
   };
 
-  // Fetch data from API
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -336,7 +339,7 @@ const CohortStatsDashboard = () => {
         setCohortsData({
           allCohorts: cohortsData,
           userCohorts: cohortsData.filter(cohort => 
-            cohort.members.some(m => m.id === member?.id)
+            cohort.members.some(m => m.id === memberId)
           ),
         });
       } catch (err) {
@@ -348,7 +351,45 @@ const CohortStatsDashboard = () => {
     };
 
     fetchData();
-  }, [selectedCohortId, member?.id]);
+  }, [selectedCohortId, memberId]);
+
+  return {
+    stats,
+    averageStats,
+    allCohorts,
+    userCohorts,
+    selectedCohortId,
+    loading,
+    error,
+    setSelectedCohortId,
+    conversionRates,
+  };
+};
+
+const CohortStatsDashboard = () => {
+  const { member } = useAuth();
+  const bgColor = useColorModeValue('gray.50', 'gray.600');
+  const ringsBgColor = useColorModeValue('gray.50', 'gray.700');
+  
+  const {
+    stats,
+    averageStats,
+    allCohorts,
+    userCohorts,
+    selectedCohortId,
+    loading,
+    error,
+    setSelectedCohortId,
+    conversionRates,
+  } = useCohortStats(member?.id);
+
+  const [tooltip, setTooltip] = useState<TooltipState>({
+    show: false,
+    content: '',
+    x: 0,
+    y: 0,
+    width: 0,
+  });
 
   const rings = [
     {
