@@ -63,7 +63,7 @@ const FitnessRings = ({
       {rings.map((ring, index) => {
         const radius = ring.radius;
         const circumference = 2 * Math.PI * radius;
-        const normalizedValue = ring.exceedsAverage 
+        const normalizedValue = ring.exceedsAverage
           ? (ring.value % ring.total) / ring.total
           : ring.value / ring.total;
         const dashoffset = circumference * (1 - normalizedValue);
@@ -91,11 +91,13 @@ const FitnessRings = ({
               transform={`rotate(-90 ${centerX} ${centerY})`}
               onMouseEnter={() => onShowTooltip(ring)}
               onMouseLeave={onHideTooltip}
-              style={{ 
-                cursor: 'pointer', 
+              style={{
+                cursor: 'pointer',
                 transition: 'opacity 0.2s',
-                filter: ring.exceedsAverage ? 'brightness(1.3) drop-shadow(0 0 4px rgba(255,255,255,0.5))' : 'none',
-                opacity: 0.9
+                filter: ring.exceedsAverage
+                  ? 'brightness(1.3) drop-shadow(0 0 4px rgba(255,255,255,0.5))'
+                  : 'none',
+                opacity: 0.9,
               }}
             />
             {ring.exceedsAverage && (
@@ -113,7 +115,7 @@ const FitnessRings = ({
                   stroke: ring.color,
                   strokeWidth: '3px',
                   strokeLinecap: 'round',
-                  strokeLinejoin: 'round'
+                  strokeLinejoin: 'round',
                 }}
               >
                 {Math.floor(ring.value / ring.total)}x
@@ -161,12 +163,12 @@ const CohortSelectionBar = ({
   onCohortSelect: (id: string) => void;
 }) => {
   const buttonStyles = {
-    size: "md",
-    borderRadius: "md",
+    size: 'md',
+    borderRadius: 'md',
     px: 6,
     _active: { opacity: 0.8 },
-    transition: "all 0.2s",
-    fontWeight: "bold"
+    transition: 'all 0.2s',
+    fontWeight: 'bold',
   };
 
   return (
@@ -190,11 +192,21 @@ const CohortSelectionBar = ({
             <Button
               {...buttonStyles}
               colorScheme="blue"
-              variant={selectedCohortId === cohort.id.toString() ? 'solid' : 'ghost'}
+              variant={
+                selectedCohortId === cohort.id.toString() ? 'solid' : 'ghost'
+              }
               onClick={() => onCohortSelect(cohort.id.toString())}
-              _hover={{ bg: selectedCohortId === cohort.id.toString() ? 'blue.600' : 'blue.50' }}
+              _hover={{
+                bg:
+                  selectedCohortId === cohort.id.toString()
+                    ? 'blue.600'
+                    : 'blue.50',
+              }}
             >
-              <Text as="span" opacity={selectedCohortId === cohort.id.toString() ? 1 : 0.8}>
+              <Text
+                as="span"
+                opacity={selectedCohortId === cohort.id.toString() ? 1 : 0.8}
+              >
                 {cohort.name}
               </Text>
               <Badge ml={2} colorScheme="blue" borderRadius="full" px={2}>
@@ -216,13 +228,13 @@ const CohortSelectionBar = ({
 };
 
 // Base layout wrapper
-const CohortDashboardLayout = ({ 
+const CohortDashboardLayout = ({
   children,
   cohorts,
   allCohorts,
   selectedCohortId,
   onCohortSelect,
-}: { 
+}: {
   children: React.ReactNode;
   cohorts: CohortView[];
   allCohorts: CohortView[];
@@ -238,7 +250,7 @@ const CohortDashboardLayout = ({
     <Heading as="h1" size="xl" textAlign="center" mb={6}>
       Your Cohorts
     </Heading>
-    <CohortSelectionBar 
+    <CohortSelectionBar
       cohorts={cohorts}
       allCohorts={allCohorts}
       selectedCohortId={selectedCohortId}
@@ -252,7 +264,7 @@ const CohortStatsDashboard = () => {
   const { member } = useAuth();
   const bgColor = useColorModeValue('gray.50', 'gray.600');
   const ringsBgColor = useColorModeValue('gray.50', 'gray.700');
-  
+
   const {
     stats,
     averageStats,
@@ -277,54 +289,87 @@ const CohortStatsDashboard = () => {
     {
       name: 'Applications',
       value: stats.applications,
-      total: selectedCohortId === 'all' ? Math.max(stats.applications, 50) : averageStats.applications,
+      total:
+        selectedCohortId === 'all'
+          ? Math.max(stats.applications, 50)
+          : averageStats.applications,
       color: '#fc0d1b',
       radius: 120,
       tooltip: `Applications: ${stats.applications.toLocaleString()} ${
-        selectedCohortId !== 'all' 
-          ? `(${((stats.applications / averageStats.applications) * 100).toFixed(1)}% of average)`
+        selectedCohortId !== 'all'
+          ? `(${(
+              (stats.applications / averageStats.applications) *
+              100
+            ).toFixed(1)}% of average)`
           : 'total applications submitted'
       }`,
-      exceedsAverage: selectedCohortId !== 'all' && stats.applications > averageStats.applications,
+      exceedsAverage:
+        selectedCohortId !== 'all' &&
+        stats.applications > averageStats.applications,
     },
     {
       name: 'Assessments',
       value: stats.onlineAssessments,
-      total: selectedCohortId === 'all' ? stats.applications : averageStats.onlineAssessments,
+      total:
+        selectedCohortId === 'all'
+          ? stats.applications
+          : averageStats.onlineAssessments,
       color: '#ffcc01',
       radius: 90,
       tooltip: `Assessments: ${stats.onlineAssessments.toLocaleString()} ${
-        selectedCohortId !== 'all' 
-          ? `(${((stats.onlineAssessments / averageStats.onlineAssessments) * 100).toFixed(1)}% of average)`
-          : `out of ${stats.applications.toLocaleString()} applications (${conversionRates.assessmentRate}%)`
+        selectedCohortId !== 'all'
+          ? `(${(
+              (stats.onlineAssessments / averageStats.onlineAssessments) *
+              100
+            ).toFixed(1)}% of average)`
+          : `out of ${stats.applications.toLocaleString()} applications (${
+              conversionRates.assessmentRate
+            }%)`
       }`,
-      exceedsAverage: selectedCohortId !== 'all' && stats.onlineAssessments > averageStats.onlineAssessments,
+      exceedsAverage:
+        selectedCohortId !== 'all' &&
+        stats.onlineAssessments > averageStats.onlineAssessments,
     },
     {
       name: 'Interviews',
       value: stats.interviews,
-      total: selectedCohortId === 'all' ? stats.onlineAssessments : averageStats.interviews,
+      total:
+        selectedCohortId === 'all'
+          ? stats.onlineAssessments
+          : averageStats.interviews,
       color: '#00d77a',
       radius: 60,
       tooltip: `Interviews: ${stats.interviews.toLocaleString()} ${
         selectedCohortId !== 'all'
-          ? `(${((stats.interviews / averageStats.interviews) * 100).toFixed(1)}% of average)`
-          : `out of ${stats.onlineAssessments.toLocaleString()} assessments (${conversionRates.interviewRate}%)`
+          ? `(${((stats.interviews / averageStats.interviews) * 100).toFixed(
+              1
+            )}% of average)`
+          : `out of ${stats.onlineAssessments.toLocaleString()} assessments (${
+              conversionRates.interviewRate
+            }%)`
       }`,
-      exceedsAverage: selectedCohortId !== 'all' && stats.interviews > averageStats.interviews,
+      exceedsAverage:
+        selectedCohortId !== 'all' &&
+        stats.interviews > averageStats.interviews,
     },
     {
       name: 'Offers',
       value: stats.offers,
-      total: selectedCohortId === 'all' ? stats.interviews : averageStats.offers,
+      total:
+        selectedCohortId === 'all' ? stats.interviews : averageStats.offers,
       color: '#0b84fe',
       radius: 30,
       tooltip: `Offers: ${stats.offers.toLocaleString()} ${
         selectedCohortId !== 'all'
-          ? `(${((stats.offers / averageStats.offers) * 100).toFixed(1)}% of average)`
-          : `out of ${stats.interviews.toLocaleString()} interviews (${conversionRates.offerRate}%)`
+          ? `(${((stats.offers / averageStats.offers) * 100).toFixed(
+              1
+            )}% of average)`
+          : `out of ${stats.interviews.toLocaleString()} interviews (${
+              conversionRates.offerRate
+            }%)`
       }`,
-      exceedsAverage: selectedCohortId !== 'all' && stats.offers > averageStats.offers,
+      exceedsAverage:
+        selectedCohortId !== 'all' && stats.offers > averageStats.offers,
     },
   ];
 
@@ -343,20 +388,37 @@ const CohortStatsDashboard = () => {
   };
 
   const renderDashboardContent = () => {
-    if (loading) return <Center h="400px"><Spinner size="xl" /></Center>;
-    if (error) return <Center h="400px"><Text color="red.500">Error loading data: {error}</Text></Center>;
+    if (loading)
+      return (
+        <Center h="400px">
+          <Spinner size="xl" />
+        </Center>
+      );
+    if (error)
+      return (
+        <Center h="400px">
+          <Text color="red.500">Error loading data: {error}</Text>
+        </Center>
+      );
 
-    const cardStyle = { p: 3, border: "1px", borderColor: "gray.200", borderRadius: "lg" };
-    const statCardStyle = {
-      align: "center",
+    const cardStyle = {
       p: 3,
-      borderRadius: "full",
+      border: '1px',
+      borderColor: 'gray.200',
+      borderRadius: 'lg',
+    };
+    const statCardStyle = {
+      align: 'center',
+      p: 3,
+      borderRadius: 'full',
       mr: 4,
     };
 
     return (
       <>
-        <Heading as="h2" size="lg" mb={6}>Application Stats</Heading>
+        <Heading as="h2" size="lg" mb={6}>
+          Application Stats
+        </Heading>
         <SimpleGrid columns={{ base: 1, md: 3 }} gap={4} mb={6}>
           <ChakraCard>
             <CardBody>
@@ -365,8 +427,12 @@ const CohortStatsDashboard = () => {
                   <TriangleUpIcon boxSize={6} color="blue.600" />
                 </Center>
                 <Box>
-                  <Text color="gray.500" fontSize="sm">Applications</Text>
-                  <Text fontSize="2xl" fontWeight="bold">{stats.applications.toLocaleString()}</Text>
+                  <Text color="gray.500" fontSize="sm">
+                    Applications
+                  </Text>
+                  <Text fontSize="2xl" fontWeight="bold">
+                    {stats.applications.toLocaleString()}
+                  </Text>
                 </Box>
               </Flex>
             </CardBody>
@@ -378,8 +444,12 @@ const CohortStatsDashboard = () => {
                   <StarIcon boxSize={6} color="green.600" />
                 </Center>
                 <Box>
-                  <Text color="gray.500" fontSize="sm">Offers</Text>
-                  <Text fontSize="2xl" fontWeight="bold">{stats.offers.toLocaleString()}</Text>
+                  <Text color="gray.500" fontSize="sm">
+                    Offers
+                  </Text>
+                  <Text fontSize="2xl" fontWeight="bold">
+                    {stats.offers.toLocaleString()}
+                  </Text>
                 </Box>
               </Flex>
             </CardBody>
@@ -392,10 +462,16 @@ const CohortStatsDashboard = () => {
                 </Center>
                 <Box>
                   <Text color="gray.500" fontSize="sm">
-                    {selectedCohortId === 'all' ? 'Highest Streak' : 'Current Streak'}
+                    {selectedCohortId === 'all'
+                      ? 'Highest Streak'
+                      : 'Current Streak'}
                   </Text>
-                  <Text fontSize="2xl" fontWeight="bold">{stats.streak} days</Text>
-                  <Text fontSize="xs" color="gray.500">{stats.dailyChecks} total check-ins</Text>
+                  <Text fontSize="2xl" fontWeight="bold">
+                    {stats.streak} days
+                  </Text>
+                  <Text fontSize="xs" color="gray.500">
+                    {stats.dailyChecks} total check-ins
+                  </Text>
                 </Box>
               </Flex>
             </CardBody>
@@ -405,10 +481,12 @@ const CohortStatsDashboard = () => {
         <SimpleGrid columns={{ base: 1, xl: 2 }} spacing={6}>
           <ChakraCard>
             <CardBody>
-              <Heading as="h2" size="md" mb={4}>Application Funnel</Heading>
-              <Flex 
-                direction={{ base: "column", md: "row" }}
-                align={{ base: "center", md: "flex-start" }}
+              <Heading as="h2" size="md" mb={4}>
+                Application Funnel
+              </Heading>
+              <Flex
+                direction={{ base: 'column', md: 'row' }}
+                align={{ base: 'center', md: 'flex-start' }}
                 justify="center"
                 gap={6}
               >
@@ -419,23 +497,38 @@ const CohortStatsDashboard = () => {
                     onShowTooltip={handleShowTooltip}
                     onHideTooltip={handleHideTooltip}
                   />
-                  <Text textAlign="center" mt={2} fontSize="sm" color="gray.500">
+                  <Text
+                    textAlign="center"
+                    mt={2}
+                    fontSize="sm"
+                    color="gray.500"
+                  >
                     Hover over rings for details
                   </Text>
                 </Box>
-                <Box w="full" maxW={{ base: "300px", md: "200px" }}>
+                <Box w="full" maxW={{ base: '300px', md: '200px' }}>
                   <VStack spacing={4} align="stretch" w="full">
                     {rings.map((ring, index) => (
-                      <Flex 
-                        key={index} 
-                        align="center" 
-                        p={2} 
+                      <Flex
+                        key={index}
+                        align="center"
+                        p={2}
                         borderRadius="md"
                         bg={ringsBgColor}
                       >
-                        <Box w="4" h="4" borderRadius="full" mr={3} bg={ring.color} />
-                        <Text fontSize="sm" fontWeight="medium">{ring.name}</Text>
-                        <Text ml="auto" fontWeight="bold">{ring.value.toLocaleString()}</Text>
+                        <Box
+                          w="4"
+                          h="4"
+                          borderRadius="full"
+                          mr={3}
+                          bg={ring.color}
+                        />
+                        <Text fontSize="sm" fontWeight="medium">
+                          {ring.name}
+                        </Text>
+                        <Text ml="auto" fontWeight="bold">
+                          {ring.value.toLocaleString()}
+                        </Text>
                       </Flex>
                     ))}
                   </VStack>
@@ -446,23 +539,41 @@ const CohortStatsDashboard = () => {
 
           <ChakraCard>
             <CardBody>
-              <Heading as="h2" size="md" mb={4}>Conversion Rates</Heading>
+              <Heading as="h2" size="md" mb={4}>
+                Conversion Rates
+              </Heading>
               <SimpleGrid columns={{ base: 1, sm: 2 }} gap={4}>
                 <Box {...cardStyle}>
-                  <Text fontSize="sm" color="gray.500">Application → Assessment</Text>
-                  <Text fontSize="xl" fontWeight="bold">{conversionRates.assessmentRate}%</Text>
+                  <Text fontSize="sm" color="gray.500">
+                    Application → Assessment
+                  </Text>
+                  <Text fontSize="xl" fontWeight="bold">
+                    {conversionRates.assessmentRate}%
+                  </Text>
                 </Box>
                 <Box {...cardStyle}>
-                  <Text fontSize="sm" color="gray.500">Assessment → Interview</Text>
-                  <Text fontSize="xl" fontWeight="bold">{conversionRates.interviewRate}%</Text>
+                  <Text fontSize="sm" color="gray.500">
+                    Assessment → Interview
+                  </Text>
+                  <Text fontSize="xl" fontWeight="bold">
+                    {conversionRates.interviewRate}%
+                  </Text>
                 </Box>
                 <Box {...cardStyle}>
-                  <Text fontSize="sm" color="gray.500">Interview → Offer</Text>
-                  <Text fontSize="xl" fontWeight="bold">{conversionRates.offerRate}%</Text>
+                  <Text fontSize="sm" color="gray.500">
+                    Interview → Offer
+                  </Text>
+                  <Text fontSize="xl" fontWeight="bold">
+                    {conversionRates.offerRate}%
+                  </Text>
                 </Box>
                 <Box {...cardStyle} bg={bgColor}>
-                  <Text fontSize="sm" color="gray.500">Overall Success Rate</Text>
-                  <Text fontSize="xl" fontWeight="bold">{conversionRates.overallRate}%</Text>
+                  <Text fontSize="sm" color="gray.500">
+                    Overall Success Rate
+                  </Text>
+                  <Text fontSize="xl" fontWeight="bold">
+                    {conversionRates.overallRate}%
+                  </Text>
                 </Box>
               </SimpleGrid>
             </CardBody>

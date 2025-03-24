@@ -84,9 +84,9 @@ export function getCohortStats(cohortId?: string) {
   const params = new URLSearchParams({
     include_profiles: 'true',
     include_individuals: 'true',
-    ...(cohortId && { cohort_id: cohortId })
+    ...(cohortId && { cohort_id: cohortId }),
   });
-  
+
   return api
     .get(`cohorts/stats/?${params}`)
     .then((res) => res.data)

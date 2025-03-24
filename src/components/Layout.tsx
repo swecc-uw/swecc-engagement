@@ -19,10 +19,11 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
+  useColorMode,
 } from '@chakra-ui/react';
 import SWECC_LOGO from '../assets/transp-swecc-logo.png';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { HamburgerIcon } from '@chakra-ui/icons';
+import { HamburgerIcon, MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { Member } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import {
@@ -62,7 +63,7 @@ const NO_REDIRECT_PATHS = ['/auth', '/join'];
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { isAuthenticated, isAdmin, loading, member, isVerified } = useAuth();
-
+  const bg = useColorModeValue('gray.50', 'gray.800');
   const navigate = useNavigate();
   const { pathname } = useLocation();
   useEffect(() => {
@@ -84,7 +85,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }
 
   return (
-    <Flex direction="column" minHeight="100vh">
+    <Flex direction="column" minHeight="100vh" bg={bg}>
       <Navbar
         member={member}
         isAuthenticated={isAuthenticated}
@@ -109,6 +110,9 @@ const Navbar: React.FC<NavBarProps> = ({
 }) => {
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { colorMode, toggleColorMode } = useColorMode();
+  const bgColor = useColorModeValue('white', 'gray.800');
+  const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   const NavLinks = () => (
     <HStack spacing={6} display={{ base: 'none', md: 'flex' }}>
@@ -126,11 +130,13 @@ const Navbar: React.FC<NavBarProps> = ({
   return (
     <Box
       as="nav"
-      bg="white"
+      bg={bgColor}
       boxShadow="sm"
       position="sticky"
       top={0}
       zIndex="sticky"
+      borderBottom="1px"
+      borderColor={borderColor}
     >
       <Container maxW="container.xl" py={3}>
         <Flex justify="space-between" align="center" height="60px">
@@ -149,7 +155,10 @@ const Navbar: React.FC<NavBarProps> = ({
                   style={{
                     width: '100%',
                     height: '100%',
-                    filter: 'brightness(0.6) contrast(1.5)',
+                    filter:
+                      colorMode === 'dark'
+                        ? 'brightness(1) contrast(1.2)'
+                        : 'brightness(0.6) contrast(1.5)',
                   }}
                 />
               </Box>
@@ -167,6 +176,16 @@ const Navbar: React.FC<NavBarProps> = ({
 
           <Flex align="center" gap={4}>
             <NavLinks />
+
+            <IconButton
+              aria-label={`Switch to ${
+                colorMode === 'light' ? 'dark' : 'light'
+              } mode`}
+              icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+              onClick={toggleColorMode}
+              variant="ghost"
+              size={{ base: 'sm', md: 'md' }}
+            />
 
             {member && isAuthenticated ? (
               <Button
@@ -204,9 +223,11 @@ const Navbar: React.FC<NavBarProps> = ({
 
       <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
         <DrawerOverlay />
-        <DrawerContent>
+        <DrawerContent bg={bgColor}>
           <DrawerCloseButton />
-          <DrawerHeader borderBottomWidth="1px">Menu</DrawerHeader>
+          <DrawerHeader borderBottomWidth="1px" borderColor={borderColor}>
+            Menu
+          </DrawerHeader>
           <DrawerBody pt={4}>
             <VStack align="stretch" spacing={4}>
               {isAuthenticated && isVerified && (
@@ -261,6 +282,17 @@ const Navbar: React.FC<NavBarProps> = ({
                   Join SWECC
                 </Button>
               )}
+              <Button
+                variant="ghost"
+                w="full"
+                justifyContent="flex-start"
+                leftIcon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+                onClick={() => {
+                  toggleColorMode();
+                }}
+              >
+                {colorMode === 'light' ? 'Dark Mode' : 'Light Mode'}
+              </Button>
             </VStack>
           </DrawerBody>
         </DrawerContent>
@@ -270,6 +302,8 @@ const Navbar: React.FC<NavBarProps> = ({
 };
 
 const NavLink: React.FC<NavLinkProps> = ({ to, children }) => {
+  const hoverBg = useColorModeValue('gray.100', 'gray.700');
+
   return (
     <Link to={to}>
       <ChakraLink
@@ -280,7 +314,7 @@ const NavLink: React.FC<NavLinkProps> = ({ to, children }) => {
         fontWeight="medium"
         _hover={{
           textDecoration: 'none',
-          bg: 'gray.100',
+          bg: hoverBg,
         }}
         display="block"
       >
@@ -289,6 +323,7 @@ const NavLink: React.FC<NavLinkProps> = ({ to, children }) => {
     </Link>
   );
 };
+
 const Footer: React.FC = () => {
   const bg = useColorModeValue('gray.50', 'gray.900');
   const color = useColorModeValue('gray.700', 'gray.200');

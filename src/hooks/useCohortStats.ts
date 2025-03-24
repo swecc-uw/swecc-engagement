@@ -40,18 +40,22 @@ export const useCohortStats = (memberId?: number): CohortStatsHookResult => {
   const [error, setError] = useState<string | null>(null);
 
   const conversionRates = {
-    assessmentRate: stats.applications > 0
-      ? ((stats.onlineAssessments / stats.applications) * 100).toFixed(1)
-      : '0',
-    interviewRate: stats.onlineAssessments > 0
-      ? ((stats.interviews / stats.onlineAssessments) * 100).toFixed(1)
-      : '0',
-    offerRate: stats.interviews > 0
-      ? ((stats.offers / stats.interviews) * 100).toFixed(1)
-      : '0',
-    overallRate: stats.applications > 0
-      ? ((stats.offers / stats.applications) * 100).toFixed(1)
-      : '0',
+    assessmentRate:
+      stats.applications > 0
+        ? ((stats.onlineAssessments / stats.applications) * 100).toFixed(1)
+        : '0',
+    interviewRate:
+      stats.onlineAssessments > 0
+        ? ((stats.interviews / stats.onlineAssessments) * 100).toFixed(1)
+        : '0',
+    offerRate:
+      stats.interviews > 0
+        ? ((stats.offers / stats.interviews) * 100).toFixed(1)
+        : '0',
+    overallRate:
+      stats.applications > 0
+        ? ((stats.offers / stats.applications) * 100).toFixed(1)
+        : '0',
   };
 
   useEffect(() => {
@@ -59,41 +63,52 @@ export const useCohortStats = (memberId?: number): CohortStatsHookResult => {
       try {
         setLoading(true);
         const [statsData, cohortsData] = await Promise.all([
-          getCohortStats(selectedCohortId === 'all' ? undefined : selectedCohortId),
+          getCohortStats(
+            selectedCohortId === 'all' ? undefined : selectedCohortId
+          ),
           getCohorts(),
         ]);
 
         if (statsData) {
           if (selectedCohortId === 'all' && Array.isArray(statsData)) {
             const totalCohorts = statsData.length;
-            const avgStats = statsData.reduce((acc, data) => ({
-              applications: acc.applications + (data.stats?.applications || 0),
-              onlineAssessments: acc.onlineAssessments + (data.stats?.onlineAssessments || 0),
-              interviews: acc.interviews + (data.stats?.interviews || 0),
-              offers: acc.offers + (data.stats?.offers || 0),
-              streak: Math.max(acc.streak, data.stats?.streak || 0),
-              dailyChecks: acc.dailyChecks + (data.stats?.dailyChecks || 0),
-            }), { ...initialStats });
+            const avgStats = statsData.reduce(
+              (acc, data) => ({
+                applications:
+                  acc.applications + (data.stats?.applications || 0),
+                onlineAssessments:
+                  acc.onlineAssessments + (data.stats?.onlineAssessments || 0),
+                interviews: acc.interviews + (data.stats?.interviews || 0),
+                offers: acc.offers + (data.stats?.offers || 0),
+                streak: Math.max(acc.streak, data.stats?.streak || 0),
+                dailyChecks: acc.dailyChecks + (data.stats?.dailyChecks || 0),
+              }),
+              { ...initialStats }
+            );
 
             setAverageStats({
               ...avgStats,
               applications: Math.round(avgStats.applications / totalCohorts),
-              onlineAssessments: Math.round(avgStats.onlineAssessments / totalCohorts),
+              onlineAssessments: Math.round(
+                avgStats.onlineAssessments / totalCohorts
+              ),
               interviews: Math.round(avgStats.interviews / totalCohorts),
               offers: Math.round(avgStats.offers / totalCohorts),
               dailyChecks: Math.round(avgStats.dailyChecks / totalCohorts),
             });
             setStats(avgStats);
           } else {
-            const statsToUse = Array.isArray(statsData) ? statsData[0]?.stats : statsData.stats;
+            const statsToUse = Array.isArray(statsData)
+              ? statsData[0]?.stats
+              : statsData.stats;
             setStats(statsToUse || initialStats);
           }
         }
 
         setCohortsData({
           allCohorts: cohortsData,
-          userCohorts: cohortsData.filter(cohort => 
-            cohort.members.some(m => m.id === memberId)
+          userCohorts: cohortsData.filter((cohort) =>
+            cohort.members.some((m) => m.id === memberId)
           ),
         });
       } catch (err) {
@@ -118,4 +133,4 @@ export const useCohortStats = (memberId?: number): CohortStatsHookResult => {
     setSelectedCohortId,
     conversionRates,
   };
-}; 
+};

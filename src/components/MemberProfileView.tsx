@@ -21,6 +21,7 @@ import {
   ModalOverlay,
   ModalContent,
   ModalCloseButton,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import {
   FaGithub,
@@ -70,11 +71,18 @@ interface MemberProfileViewProps {
 }
 
 const MemberProfileView: React.FC<MemberProfileViewProps> = ({ member }) => {
-  const bgColor = 'white';
-  const borderColor = 'gray.200';
-  const iconColor = 'gray.600';
-  const hoverColor = 'blue.500';
-  const sectionBg = 'gray.50';
+  const bgColor = useColorModeValue('white', 'gray.800');
+  const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const borderColorAccent = useColorModeValue('blue.400', 'blue.300');
+  const bgHover = useColorModeValue('gray.50', 'gray.700');
+  const bgError = useColorModeValue('red.50', 'red.900');
+  const iconColor = useColorModeValue('gray.600', 'gray.400');
+  const hoverColor = useColorModeValue('blue.500', 'blue.300');
+  const sectionBg = useColorModeValue('gray.50', 'gray.700');
+  const textColor = useColorModeValue('gray.800', 'white');
+  const mutedColor = useColorModeValue('gray.500', 'gray.400');
+  const labelColor = useColorModeValue('gray.500', 'gray.400');
+  const dividerColor = useColorModeValue('gray.200', 'gray.600');
 
   const toast = useToast();
   const { onCopy: onDiscordCopy } = useClipboard(
@@ -105,6 +113,7 @@ const MemberProfileView: React.FC<MemberProfileViewProps> = ({ member }) => {
       <Link
         href={href}
         isExternal
+        color={iconColor}
         _hover={{ color: hoverColor, textDecoration: 'none' }}
         display="flex"
         alignItems="center"
@@ -134,12 +143,14 @@ const MemberProfileView: React.FC<MemberProfileViewProps> = ({ member }) => {
           as="span"
           fontWeight="semibold"
           fontSize="sm"
-          color="gray.500"
+          color={labelColor}
           display="block"
         >
           {label}
         </Box>
-        <Box mt={1}>{value}</Box>
+        <Box mt={1} color={textColor}>
+          {value}
+        </Box>
       </Box>
     </Flex>
   );
@@ -154,7 +165,7 @@ const MemberProfileView: React.FC<MemberProfileViewProps> = ({ member }) => {
         onClose={onClose}
       >
         <ModalOverlay />
-        <ModalContent maxH="800px" maxW="700px">
+        <ModalContent maxH="800px" maxW="700px" bg={bgColor}>
           <ModalCloseButton />
           <ReportPopup
             title="Report User"
@@ -177,6 +188,11 @@ const MemberProfileView: React.FC<MemberProfileViewProps> = ({ member }) => {
         overflow="hidden"
         maxW="4xl"
         w="full"
+        transition="all 0.2s"
+        _hover={{
+          boxShadow: '2xl',
+          transform: 'translateY(-2px)',
+        }}
       >
         <Box px={8} py={6}>
           <Stack
@@ -189,6 +205,8 @@ const MemberProfileView: React.FC<MemberProfileViewProps> = ({ member }) => {
               name={resolveName(member)}
               src={member.profilePictureUrl}
               bg="blue.500"
+              borderWidth="3px"
+              borderColor={borderColorAccent}
             />
             <VStack
               align={{ base: 'center', md: 'start' }}
@@ -197,14 +215,19 @@ const MemberProfileView: React.FC<MemberProfileViewProps> = ({ member }) => {
             >
               <HStack width="100%" justify="space-between">
                 <Box>
-                  <Box fontSize="3xl" fontWeight="bold" lineHeight="shorter">
+                  <Box
+                    fontSize="3xl"
+                    fontWeight="bold"
+                    lineHeight="shorter"
+                    color={textColor}
+                  >
                     {member.firstName} {member.lastName}
                   </Box>
-                  <Box color="gray.500" fontSize="md">
+                  <Box color={mutedColor} fontSize="md">
                     @{member.username}
                   </Box>
                   {member.preview && (
-                    <Box color="gray.500" fontSize="sm" mt={1}>
+                    <Box color={mutedColor} fontSize="sm" mt={1}>
                       {member.preview}
                     </Box>
                   )}
@@ -216,6 +239,9 @@ const MemberProfileView: React.FC<MemberProfileViewProps> = ({ member }) => {
                     variant="ghost"
                     size="sm"
                     onClick={onOpen}
+                    _hover={{
+                      bg: bgError,
+                    }}
                   >
                     Report User
                   </Button>
@@ -235,17 +261,19 @@ const MemberProfileView: React.FC<MemberProfileViewProps> = ({ member }) => {
           </Stack>
         </Box>
 
-        <Divider />
+        <Divider borderColor={dividerColor} />
 
         {/* contact */}
         <Box px={8} py={6} bg={sectionBg}>
-          <Box fontSize="lg" fontWeight="bold" mb={4}>
+          <Box fontSize="lg" fontWeight="bold" mb={4} color={textColor}>
             Contact Information
           </Box>
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
             <HStack spacing={2}>
               <Icon as={FaEnvelope} color={iconColor} />
-              <Box flex="1">{member.email}</Box>
+              <Box flex="1" color={textColor}>
+                {member.email}
+              </Box>
               <Button
                 size="sm"
                 leftIcon={<FaCopy />}
@@ -257,13 +285,20 @@ const MemberProfileView: React.FC<MemberProfileViewProps> = ({ member }) => {
                     duration: 2000,
                   });
                 }}
+                colorScheme="blue"
+                variant="outline"
+                _hover={{
+                  bg: bgHover,
+                }}
               >
                 Copy
               </Button>
             </HStack>
             <HStack spacing={2}>
               <Icon as={FaDiscord} color={iconColor} />
-              <Box flex="1">{member.discordUsername}</Box>
+              <Box flex="1" color={textColor}>
+                {member.discordUsername}
+              </Box>
               <Button
                 size="sm"
                 leftIcon={<FaCopy />}
@@ -275,18 +310,23 @@ const MemberProfileView: React.FC<MemberProfileViewProps> = ({ member }) => {
                     duration: 2000,
                   });
                 }}
+                colorScheme="blue"
+                variant="outline"
+                _hover={{
+                  bg: bgHover,
+                }}
               >
-                Copy Username
+                Copy
               </Button>
             </HStack>
           </SimpleGrid>
         </Box>
 
-        <Divider />
+        <Divider borderColor={dividerColor} />
 
         {/* profile info */}
         <Box px={8} py={6}>
-          <Box fontSize="lg" fontWeight="bold" mb={4}>
+          <Box fontSize="lg" fontWeight="bold" mb={4} color={textColor}>
             Profile Details
           </Box>
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
@@ -346,23 +386,25 @@ const MemberProfileView: React.FC<MemberProfileViewProps> = ({ member }) => {
                     as="span"
                     fontWeight="semibold"
                     fontSize="sm"
-                    color="gray.500"
+                    color={labelColor}
                     display="block"
                   >
                     Bio
                   </Box>
-                  <Box mt={1}>{member.bio}</Box>
+                  <Box mt={1} color={textColor}>
+                    {member.bio}
+                  </Box>
                 </Box>
               )}
             </VStack>
           </SimpleGrid>
         </Box>
 
-        <Divider />
+        <Divider borderColor={dividerColor} />
 
         {/* social */}
         <Box px={8} py={6}>
-          <Box fontSize="lg" fontWeight="bold" mb={4}>
+          <Box fontSize="lg" fontWeight="bold" mb={4} color={textColor}>
             External Profiles & Links
           </Box>
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
