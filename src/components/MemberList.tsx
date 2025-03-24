@@ -70,6 +70,7 @@ const MemberCard = ({
       }}
       transition="all 0.2s"
       w="100%"
+      key={member.id}
     >
       <Flex direction={{ base: 'column', sm: 'row' }} gap={4}>
         <Avatar
@@ -204,8 +205,12 @@ const MemberCard = ({
                   {member.role}
                 </Badge>
               )}
-              {member.groups?.map((group) => (
-                <Badge key={group.name} colorScheme="blue" fontSize="xs">
+              {member.groups?.map((group, index) => (
+                <Badge
+                  key={`${member.id}-group-${index}-${group.name}`}
+                  colorScheme="blue"
+                  fontSize="xs"
+                >
                   {group.name}
                 </Badge>
               ))}
