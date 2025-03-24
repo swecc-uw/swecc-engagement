@@ -59,7 +59,6 @@ export function useCohortForm(cohortId?: string) {
     }
   }
 
-
   useEffect(() => {
     loadCohort();
   }, [cohortId, isEditMode, navigate, toast]);

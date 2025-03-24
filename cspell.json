@@ -11,7 +11,8 @@
     "Glassdoor",
     "Formik",
     "kwargs",
-    "metasync"
+    "metasync",
+    "Leaderboards"
   ],
   "ignorePaths": ["node_modules/**", "dist/**", "build/**"],
   "files": ["src/**/*.{tsx,ts,html,md}"]
