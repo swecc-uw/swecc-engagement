@@ -21,6 +21,7 @@ import {
   Flex,
   Divider,
   As,
+  useColorMode,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import LeetcodeProfile from '../components/LeetcodeProfile';
@@ -45,6 +46,8 @@ interface WidgetCardProps {
 const WidgetCard: React.FC<WidgetCardProps> = ({ icon, title, children }) => {
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const bgColor = useColorModeValue('white', 'gray.800');
+  const titleColor = useColorModeValue('gray.800', 'white');
+  const iconColor = useColorModeValue('blue.500', 'blue.300');
 
   return (
     <Card
@@ -54,16 +57,21 @@ const WidgetCard: React.FC<WidgetCardProps> = ({ icon, title, children }) => {
       shadow="lg"
       borderRadius="xl"
       h="full"
+      _hover={{
+        borderColor: useColorModeValue('blue.200', 'blue.500'),
+        transform: 'translateY(-2px)',
+      }}
+      transition="all 0.2s"
     >
       <CardHeader pb={2}>
         <HStack spacing={2}>
-          <Icon as={icon} color="blue.500" boxSize={5} />
-          <Text fontSize="lg" fontWeight="bold">
+          <Icon as={icon} color={iconColor} boxSize={5} />
+          <Text fontSize="lg" fontWeight="bold" color={titleColor}>
             {title}
           </Text>
         </HStack>
       </CardHeader>
-      <Divider />
+      <Divider borderColor={borderColor} />
       <CardBody>{children}</CardBody>
     </Card>
   );
@@ -72,6 +80,9 @@ const WidgetCard: React.FC<WidgetCardProps> = ({ icon, title, children }) => {
 const Widgets: React.FC<{ member: Member }> = ({ member }) => {
   const chartBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const cardBg = useColorModeValue('white', 'gray.800');
+  const titleColor = useColorModeValue('gray.800', 'white');
+  const iconColor = useColorModeValue('blue.500', 'blue.300');
   const [githubStats, setGithubStats] = useState<GithubStats>();
   const [leetcodeStats, setLeetcodeStats] = useState<LeetcodeStats>();
   const [isLoading, setIsLoading] = useState(true);
@@ -100,16 +111,22 @@ const Widgets: React.FC<{ member: Member }> = ({ member }) => {
       shadow="lg"
       w="full"
       maxW="4xl"
+      bg={cardBg}
+      _hover={{
+        borderColor: useColorModeValue('blue.200', 'blue.500'),
+        transform: 'translateY(-2px)',
+      }}
+      transition="all 0.2s"
     >
       <CardHeader>
         <HStack spacing={2}>
-          <Icon as={FaChartBar} color="blue.500" boxSize={5} />
-          <Text fontSize="lg" fontWeight="bold">
+          <Icon as={FaChartBar} color={iconColor} boxSize={5} />
+          <Text fontSize="lg" fontWeight="bold" color={titleColor}>
             Activity Overview
           </Text>
         </HStack>
       </CardHeader>
-      <Divider />
+      <Divider borderColor={borderColor} />
       <CardBody>
         <Stack
           direction={{ base: 'column', lg: 'row' }}
@@ -163,7 +180,15 @@ const MemberProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [member, setMember] = useState<Member>();
   const [isSaving, setIsSaving] = useState(false);
+  const { colorMode } = useColorMode();
+
   const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const borderColorSel = useColorModeValue('blue.200', 'blue.500');
+  const cardBg = useColorModeValue('white', 'gray.800');
+  const titleColor = useColorModeValue('gray.800', 'white');
+  const iconColor = useColorModeValue('blue.500', 'blue.300');
+  const pageBg = useColorModeValue('gray.50', 'gray.900');
+  const buttonHoverBg = useColorModeValue('red.50', 'red.900');
 
   const onSave = async (updatedMember: Partial<Member>) => {
     setIsSaving(true);
@@ -196,7 +221,7 @@ const MemberProfilePage: React.FC = () => {
   };
 
   return (
-    <Box minH="calc(100vh - 64px)" py={8}>
+    <Box minH="calc(100vh - 64px)" py={8} bg={pageBg}>
       <Container maxW="container.xl" px={{ base: 4, md: 8 }} centerContent>
         <VStack spacing={6} align="stretch" maxW="4xl" w="full">
           {/* header */}
@@ -205,6 +230,12 @@ const MemberProfilePage: React.FC = () => {
             borderColor={borderColor}
             borderRadius="xl"
             shadow="lg"
+            bg={cardBg}
+            _hover={{
+              borderColor: borderColorSel,
+              transform: 'translateY(-2px)',
+            }}
+            transition="all 0.2s"
           >
             <CardHeader>
               <Flex
@@ -214,8 +245,8 @@ const MemberProfilePage: React.FC = () => {
                 gap={4}
               >
                 <HStack spacing={3}>
-                  <Icon as={FaUser} boxSize={6} color="blue.500" />
-                  <Text fontSize="lg" fontWeight="bold">
+                  <Icon as={FaUser} boxSize={6} color={iconColor} />
+                  <Text fontSize="lg" fontWeight="bold" color={titleColor}>
                     Your Profile
                   </Text>
                 </HStack>
@@ -225,6 +256,10 @@ const MemberProfilePage: React.FC = () => {
                     colorScheme="blue"
                     onClick={() => setIsEditing((prev) => !prev)}
                     isLoading={isSaving}
+                    _hover={{
+                      bg: colorMode === 'dark' ? 'blue.600' : '',
+                      transform: 'translateY(-2px)',
+                    }}
                   >
                     {isEditing ? 'Cancel' : 'Edit Profile'}
                   </Button>
@@ -233,6 +268,10 @@ const MemberProfilePage: React.FC = () => {
                     colorScheme="red"
                     variant="ghost"
                     onClick={handleLogout}
+                    _hover={{
+                      bg: buttonHoverBg,
+                      transform: 'translateY(-2px)',
+                    }}
                   >
                     Logout
                   </Button>
