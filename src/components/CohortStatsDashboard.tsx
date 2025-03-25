@@ -64,8 +64,8 @@ const FitnessRings = ({
         const radius = ring.radius;
         const circumference = 2 * Math.PI * radius;
         const normalizedValue = ring.exceedsAverage
-          ? (ring.value % ring.total) / ring.total
-          : ring.value / ring.total;
+          ? (ring.value % ring.total) / (ring.total || 1)
+          : ring.value / (ring.total || 1);
         const dashoffset = circumference * (1 - normalizedValue);
 
         return (
@@ -118,7 +118,7 @@ const FitnessRings = ({
                   strokeLinejoin: 'round',
                 }}
               >
-                {Math.floor(ring.value / ring.total)}x
+                {Math.floor(ring.value / (ring.total || 1))}x
               </text>
             )}
           </g>
@@ -210,12 +210,12 @@ const CohortSelectionBar = ({
                 {cohort.name}
               </Text>
               <Badge ml={2} colorScheme="blue" borderRadius="full" px={2}>
-                {cohort.members.length}
+                {cohort.members?.length || 0}
               </Badge>
             </Button>
           </WrapItem>
         ))}
-        {!cohorts.length && (
+        {!cohorts?.length && (
           <WrapItem>
             <Text fontSize="md" color="gray.500" ml={2}>
               You are not currently part of any cohorts
@@ -285,6 +285,19 @@ const CohortStatsDashboard = () => {
     width: 0,
   });
 
+  const safeAvgStats = {
+    applications: Math.max(averageStats.applications, 1),
+    onlineAssessments: Math.max(averageStats.onlineAssessments, 1),
+    interviews: Math.max(averageStats.interviews, 1),
+    offers: Math.max(averageStats.offers, 1),
+    dailyChecks: averageStats.dailyChecks,
+    streak: averageStats.streak,
+  };
+
+  const safePercentage = (value: number, total: number) => {
+    return total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
+  };
+
   const rings = [
     {
       name: 'Applications',
@@ -292,57 +305,58 @@ const CohortStatsDashboard = () => {
       total:
         selectedCohortId === 'all'
           ? Math.max(stats.applications, 50)
-          : averageStats.applications,
+          : safeAvgStats.applications,
       color: '#fc0d1b',
       radius: 120,
       tooltip: `Applications: ${stats.applications.toLocaleString()} ${
         selectedCohortId !== 'all'
-          ? `(${(
-              (stats.applications / averageStats.applications) *
-              100
-            ).toFixed(1)}% of average)`
+          ? `(${safePercentage(
+              stats.applications,
+              safeAvgStats.applications
+            )}% of average)`
           : 'total applications submitted'
       }`,
       exceedsAverage:
         selectedCohortId !== 'all' &&
-        stats.applications > averageStats.applications,
+        stats.applications > safeAvgStats.applications,
     },
     {
       name: 'Assessments',
       value: stats.onlineAssessments,
       total:
         selectedCohortId === 'all'
-          ? stats.applications
-          : averageStats.onlineAssessments,
+          ? Math.max(stats.applications, 1)
+          : safeAvgStats.onlineAssessments,
       color: '#ffcc01',
       radius: 90,
       tooltip: `Assessments: ${stats.onlineAssessments.toLocaleString()} ${
         selectedCohortId !== 'all'
-          ? `(${(
-              (stats.onlineAssessments / averageStats.onlineAssessments) *
-              100
-            ).toFixed(1)}% of average)`
+          ? `(${safePercentage(
+              stats.onlineAssessments,
+              safeAvgStats.onlineAssessments
+            )}% of average)`
           : `out of ${stats.applications.toLocaleString()} applications (${
               conversionRates.assessmentRate
             }%)`
       }`,
       exceedsAverage:
         selectedCohortId !== 'all' &&
-        stats.onlineAssessments > averageStats.onlineAssessments,
+        stats.onlineAssessments > safeAvgStats.onlineAssessments,
     },
     {
       name: 'Interviews',
       value: stats.interviews,
       total:
         selectedCohortId === 'all'
-          ? stats.onlineAssessments
-          : averageStats.interviews,
+          ? Math.max(stats.onlineAssessments, 1)
+          : safeAvgStats.interviews,
       color: '#00d77a',
       radius: 60,
       tooltip: `Interviews: ${stats.interviews.toLocaleString()} ${
         selectedCohortId !== 'all'
-          ? `(${((stats.interviews / averageStats.interviews) * 100).toFixed(
-              1
+          ? `(${safePercentage(
+              stats.interviews,
+              safeAvgStats.interviews
             )}% of average)`
           : `out of ${stats.onlineAssessments.toLocaleString()} assessments (${
               conversionRates.interviewRate
@@ -350,26 +364,26 @@ const CohortStatsDashboard = () => {
       }`,
       exceedsAverage:
         selectedCohortId !== 'all' &&
-        stats.interviews > averageStats.interviews,
+        stats.interviews > safeAvgStats.interviews,
     },
     {
       name: 'Offers',
       value: stats.offers,
       total:
-        selectedCohortId === 'all' ? stats.interviews : averageStats.offers,
+        selectedCohortId === 'all'
+          ? Math.max(stats.interviews, 1)
+          : safeAvgStats.offers,
       color: '#0b84fe',
       radius: 30,
       tooltip: `Offers: ${stats.offers.toLocaleString()} ${
         selectedCohortId !== 'all'
-          ? `(${((stats.offers / averageStats.offers) * 100).toFixed(
-              1
-            )}% of average)`
+          ? `(${safePercentage(stats.offers, safeAvgStats.offers)}% of average)`
           : `out of ${stats.interviews.toLocaleString()} interviews (${
               conversionRates.offerRate
             }%)`
       }`,
       exceedsAverage:
-        selectedCohortId !== 'all' && stats.offers > averageStats.offers,
+        selectedCohortId !== 'all' && stats.offers > safeAvgStats.offers,
     },
   ];
 
@@ -585,8 +599,8 @@ const CohortStatsDashboard = () => {
 
   return (
     <CohortDashboardLayout
-      cohorts={userCohorts}
-      allCohorts={allCohorts}
+      cohorts={userCohorts || []}
+      allCohorts={allCohorts || []}
       selectedCohortId={selectedCohortId}
       onCohortSelect={setSelectedCohortId}
     >
