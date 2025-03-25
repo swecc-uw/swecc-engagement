@@ -80,10 +80,14 @@ export async function transferToCohort(
   return response.status === 200;
 }
 
-export function getCohortStats(cohortId?: string) {
+export function getCohortStats(
+  cohortId?: string,
+  includeProfiles = false,
+  includeIndividuals = false
+) {
   const params = new URLSearchParams({
-    include_profiles: 'true',
-    include_individuals: 'true',
+    include_profiles: includeProfiles.toString(),
+    include_individuals: includeIndividuals.toString(),
     ...(cohortId && { cohort_id: cohortId }),
   });
 
