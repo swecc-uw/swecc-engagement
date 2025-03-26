@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getCohortStats, getCohorts } from '../services/cohort';
 import { CohortView } from '../types';
-import { devPrint } from '../components/utils/RandomUtils';
 
 const initialStats = {
   applications: 0,
@@ -33,15 +32,12 @@ interface CohortStatsHookResult {
 export const useCohortStats = (memberId?: number): CohortStatsHookResult => {
   const [selectedCohortId, setSelectedCohortId] = useState<string>('all');
 
-  const statsQuery = useQuery({
-    queryKey: ['cohortStats', selectedCohortId],
-    queryFn: () =>
-      getCohortStats(selectedCohortId === 'all' ? undefined : selectedCohortId),
-  });
-
   const allStatsQuery = useQuery({
     queryKey: ['allCohortStats'],
-    queryFn: () => getCohortStats(undefined),
+    queryFn: () =>
+      getCohortStats(undefined) as Promise<
+        { cohort?: { id: number }; stats?: typeof initialStats }[]
+      >,
   });
 
   const cohortsQuery = useQuery({
@@ -49,90 +45,100 @@ export const useCohortStats = (memberId?: number): CohortStatsHookResult => {
     queryFn: getCohorts,
   });
 
+  const selectedCohortStats = useMemo(() => {
+    if (selectedCohortId === 'all' || !allStatsQuery.data) return null;
+
+    const cohortId = parseInt(selectedCohortId, 10);
+    return (
+      allStatsQuery.data.find(
+        (item: { cohort?: { id: number }; stats?: typeof initialStats }) =>
+          item.cohort?.id === cohortId
+      )?.stats || null
+    );
+  }, [selectedCohortId, allStatsQuery.data]);
+
   const allCohortsStats = useMemo(() => {
-    if (!statsQuery.data || !Array.isArray(statsQuery.data))
-      return initialStats;
+    const data = allStatsQuery.data;
+    if (!data || !Array.isArray(data) || data.length === 0) return initialStats;
 
-    if (statsQuery.data.length === 0) return initialStats;
-
-    return statsQuery.data.reduce(
-      (acc, data) => ({
-        applications: acc.applications + (data.stats?.applications || 0),
+    return data.reduce(
+      (acc, item) => ({
+        applications: acc.applications + (item.stats?.applications || 0),
         onlineAssessments:
-          acc.onlineAssessments + (data.stats?.onlineAssessments || 0),
-        interviews: acc.interviews + (data.stats?.interviews || 0),
-        offers: acc.offers + (data.stats?.offers || 0),
-        streak: Math.max(acc.streak, data.stats?.streak || 0),
-        dailyChecks: acc.dailyChecks + (data.stats?.dailyChecks || 0),
+          acc.onlineAssessments + (item.stats?.onlineAssessments || 0),
+        interviews: acc.interviews + (item.stats?.interviews || 0),
+        offers: acc.offers + (item.stats?.offers || 0),
+        streak: Math.max(acc.streak, item.stats?.streak || 0),
+        dailyChecks: acc.dailyChecks + (item.stats?.dailyChecks || 0),
       }),
       { ...initialStats }
     );
-  }, [statsQuery.data]);
+  }, [allStatsQuery.data]);
 
   const stats = useMemo(() => {
-    if (!statsQuery.data) return initialStats;
+    if (selectedCohortId === 'all') return allCohortsStats;
+    if (!selectedCohortStats) return initialStats;
 
-    if (selectedCohortId === 'all' && Array.isArray(statsQuery.data)) {
-      return allCohortsStats;
-    } else {
-      const statsToUse = Array.isArray(statsQuery.data)
-        ? statsQuery.data[0]?.stats
-        : statsQuery.data?.stats;
-
-      if (!statsToUse) return initialStats;
-
-      return {
-        applications: statsToUse.applications || 0,
-        onlineAssessments: statsToUse.onlineAssessments || 0,
-        interviews: statsToUse.interviews || 0,
-        offers: statsToUse.offers || 0,
-        dailyChecks: statsToUse.dailyChecks || 0,
-        streak: statsToUse.streak || 0,
-      };
-    }
-  }, [selectedCohortId, statsQuery.data, allCohortsStats]);
+    return {
+      applications: selectedCohortStats.applications || 0,
+      onlineAssessments: selectedCohortStats.onlineAssessments || 0,
+      interviews: selectedCohortStats.interviews || 0,
+      offers: selectedCohortStats.offers || 0,
+      dailyChecks: selectedCohortStats.dailyChecks || 0,
+      streak: selectedCohortStats.streak || 0,
+    };
+  }, [selectedCohortId, selectedCohortStats, allCohortsStats]);
 
   const averageStats = useMemo(() => {
-    if (!allStatsQuery.data || !Array.isArray(allStatsQuery.data)) {
-      devPrint('No all stats data', allStatsQuery);
-      return initialStats;
-    }
+    const data = allStatsQuery.data;
+    if (!data || !Array.isArray(data) || data.length === 0) return initialStats;
 
-    const totalCohorts = allStatsQuery.data.length;
+    const totalCohorts = data.length;
 
-    if (totalCohorts === 0) {
-      devPrint('No cohorts');
-      return initialStats;
-    }
-
-    const allCohortsTotal = allStatsQuery.data.reduce(
-      (acc, data) => ({
-        applications: acc.applications + (data.stats?.applications || 0),
+    const totals = data.reduce(
+      (acc, item) => ({
+        applications: acc.applications + (item.stats?.applications || 0),
         onlineAssessments:
-          acc.onlineAssessments + (data.stats?.onlineAssessments || 0),
-        interviews: acc.interviews + (data.stats?.interviews || 0),
-        offers: acc.offers + (data.stats?.offers || 0),
-        dailyChecks: acc.dailyChecks + (data.stats?.dailyChecks || 0),
-
-        streak: Math.max(acc.streak, data.stats?.streak || 0),
+          acc.onlineAssessments + (item.stats?.onlineAssessments || 0),
+        interviews: acc.interviews + (item.stats?.interviews || 0),
+        offers: acc.offers + (item.stats?.offers || 0),
+        dailyChecks: acc.dailyChecks + (item.stats?.dailyChecks || 0),
+        streak: Math.max(acc.streak, item.stats?.streak || 0),
       }),
       { ...initialStats }
     );
 
-    devPrint('Calculating average stats from ALL cohorts', allCohortsTotal);
-
-    return {
-      applications:
-        Math.round(allCohortsTotal.applications / totalCohorts) || 0,
-      onlineAssessments:
-        Math.round(allCohortsTotal.onlineAssessments / totalCohorts) || 0,
-      interviews: Math.round(allCohortsTotal.interviews / totalCohorts) || 0,
-      offers: Math.round(allCohortsTotal.offers / totalCohorts) || 0,
-      dailyChecks: Math.round(allCohortsTotal.dailyChecks / totalCohorts) || 0,
-
-      streak: allCohortsTotal.streak,
+    const result = {
+      applications: totals.applications / totalCohorts || 0,
+      onlineAssessments: totals.onlineAssessments / totalCohorts || 0,
+      interviews: totals.interviews / totalCohorts || 0,
+      offers: totals.offers / totalCohorts || 0,
+      dailyChecks: totals.dailyChecks / totalCohorts || 0,
+      streak: totals.streak,
     };
+
+    return result;
   }, [allStatsQuery.data]);
+
+  const conversionRates = useMemo(() => {
+    const safePercentage = (numerator: number, denominator: number): string => {
+      if (!denominator) return '0.0';
+      const result = (numerator / denominator) * 100;
+      return isFinite(result) ? result.toFixed(1) : '0.0';
+    };
+
+    const rates = {
+      assessmentRate: safePercentage(
+        stats.onlineAssessments,
+        stats.applications
+      ),
+      interviewRate: safePercentage(stats.interviews, stats.onlineAssessments),
+      offerRate: safePercentage(stats.offers, stats.interviews),
+      overallRate: safePercentage(stats.offers, stats.applications),
+    };
+
+    return rates;
+  }, [stats]);
 
   const { allCohorts, userCohorts } = useMemo(() => {
     const allCohortsData = cohortsQuery.data || [];
@@ -146,41 +152,19 @@ export const useCohortStats = (memberId?: number): CohortStatsHookResult => {
     };
   }, [cohortsQuery.data, memberId]);
 
-  const conversionRates = useMemo(() => {
-    const safePercentage = (numerator: number, denominator: number): string => {
-      if (!denominator || denominator === 0) return '0.0';
-      const result = (numerator / denominator) * 100;
-
-      return isFinite(result) ? result.toFixed(1) : '0.0';
-    };
-
-    return {
-      assessmentRate: safePercentage(
-        stats.onlineAssessments,
-        stats.applications
-      ),
-      interviewRate: safePercentage(stats.interviews, stats.onlineAssessments),
-      offerRate: safePercentage(stats.offers, stats.interviews),
-      overallRate: safePercentage(stats.offers, stats.applications),
-    };
-  }, [stats]);
-
-  const loading =
-    statsQuery.isPending || cohortsQuery.isPending || allStatsQuery.isPending;
+  const loading = allStatsQuery.isPending || cohortsQuery.isPending;
   const error =
-    statsQuery.error || cohortsQuery.error || allStatsQuery.error
-      ? 'Failed to load stats'
-      : null;
+    allStatsQuery.error || cohortsQuery.error ? 'Failed to load stats' : null;
 
   return {
-    stats, // currently selected cohort stats
-    averageStats, // average stats over all cohorts
-    allCohorts, // ALL cohorts
-    userCohorts, // cohorts that the user is a member of
+    stats,
+    averageStats,
+    allCohorts,
+    userCohorts,
     selectedCohortId,
     loading,
     error,
     setSelectedCohortId,
-    conversionRates, // conversion from one stage to the next
+    conversionRates,
   };
 };

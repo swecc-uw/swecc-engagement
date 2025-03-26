@@ -22,6 +22,7 @@ import { CohortView } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { useCohortStats } from '../hooks/useCohortStats';
 
+const EPS = 0.0000001;
 interface Ring {
   name: string;
   value: number;
@@ -286,10 +287,10 @@ const CohortStatsDashboard = () => {
   });
 
   const safeAvgStats = {
-    applications: Math.max(averageStats.applications, 1),
-    onlineAssessments: Math.max(averageStats.onlineAssessments, 1),
-    interviews: Math.max(averageStats.interviews, 1),
-    offers: Math.max(averageStats.offers, 1),
+    applications: Math.max(averageStats.applications, EPS),
+    onlineAssessments: Math.max(averageStats.onlineAssessments, EPS),
+    interviews: Math.max(averageStats.interviews, EPS),
+    offers: Math.max(averageStats.offers, EPS),
     dailyChecks: averageStats.dailyChecks,
     streak: averageStats.streak,
   };
