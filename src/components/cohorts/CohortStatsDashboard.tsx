@@ -6,6 +6,7 @@ import {
   Button,
   Wrap,
   WrapItem,
+  Heading,
 } from '@chakra-ui/react';
 
 import { CohortView } from '../../types';
@@ -117,13 +118,6 @@ const CohortDashboardLayout = ({
       selectedCohortId={selectedCohortId}
       onCohortSelect={onCohortSelect}
     />
-    {selectedCohortId === 'all' ? (
-      <CohortList cohorts={cohorts} />
-    ) : (
-      <MyCohortView
-        cohort={cohorts.find((c) => String(c.id) === selectedCohortId)}
-      />
-    )}
     {children}
   </Box>
 );
@@ -150,16 +144,26 @@ const CohortStatsDashboard = () => {
       selectedCohortId={selectedCohortId}
       onCohortSelect={setSelectedCohortId}
     >
-      {
-        <ApplicationStats
-          loading={loading}
-          error={error}
-          stats={stats}
-          selectedCohortId={selectedCohortId}
-          averageStats={averageStats}
-          conversionRates={conversionRates}
+      <ApplicationStats
+        loading={loading}
+        error={error}
+        stats={stats}
+        selectedCohortId={selectedCohortId}
+        averageStats={averageStats}
+        conversionRates={conversionRates}
+      />
+      {selectedCohortId === 'all' ? (
+        <CohortList cohorts={allCohorts} />
+      ) : (
+        <MyCohortView
+          cohort={allCohorts.find((c) => String(c.id) === selectedCohortId)}
+          heading={
+            <Heading as="h2" size="lg" mb={6}>
+              Members
+            </Heading>
+          }
         />
-      }
+      )}
     </CohortDashboardLayout>
   );
 };
