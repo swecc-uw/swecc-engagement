@@ -12,21 +12,24 @@ const initialStats = {
   streak: 0,
 };
 
+export type CohortStats = typeof initialStats;
+
+export type ConversionRates = {
+  assessmentRate: string;
+  interviewRate: string;
+  offerRate: string;
+  overallRate: string;
+}
 interface CohortStatsHookResult {
-  stats: typeof initialStats;
-  averageStats: typeof initialStats;
+  stats: CohortStats;
+  averageStats: CohortStats;
   allCohorts: CohortView[];
   userCohorts: CohortView[];
   selectedCohortId: string;
   loading: boolean;
   error: string | null;
   setSelectedCohortId: (id: string) => void;
-  conversionRates: {
-    assessmentRate: string;
-    interviewRate: string;
-    offerRate: string;
-    overallRate: string;
-  };
+  conversionRates: ConversionRates;
 }
 
 export const useCohortStats = (memberId?: number): CohortStatsHookResult => {
