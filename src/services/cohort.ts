@@ -80,19 +80,13 @@ export async function transferToCohort(
   return response.status === 200;
 }
 
-export function getCohortStats(
-  cohortId?: string,
-  includeProfiles = false,
-  includeIndividuals = false
-) {
+export function getCohortStats(cohortId?: string) {
   const params = new URLSearchParams({
-    include_profiles: includeProfiles.toString(),
-    include_individuals: includeIndividuals.toString(),
     ...(cohortId && { cohort_id: cohortId }),
   });
 
   return api
-    .get(`cohorts/stats/?${params}`)
+    .get(`/cohorts/stats/?${params}`)
     .then((res) => res.data)
     .catch((err) => {
       console.error(err);
