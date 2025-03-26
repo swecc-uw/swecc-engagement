@@ -3,12 +3,22 @@ import { createCohort } from '../services/cohort';
 import { useCallback, useState } from 'react';
 import { useToast } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+import { Member } from '../types';
 
 export function useCohortBulkCreate() {
   const [isLoading, setIsLoading] = useState(false);
-  const members = useCallback(() => getAllMembers(), []);
+  const [membersData, setMembersData] = useState<undefined | Member[]>();
   const toast = useToast();
   const navigate = useNavigate();
+
+  const fetchMembers = useCallback(async () => {
+    if (!membersData) {
+      const data = await getAllMembers();
+      setMembersData(data);
+      return data;
+    }
+    return membersData;
+  }, [membersData]);
 
   function parse(
     data: string,
@@ -39,10 +49,11 @@ export function useCohortBulkCreate() {
     setIsLoading(true);
     try {
       const parsed = parse(data, includesHeaderRow);
-      const cohorts: Record<string, { level: string; memberIds: number[] }> =
-        {};
+      const allMembers = await fetchMembers();
+      const cohorts: Record<string, { level: string; memberIds: number[] }> = {};
+
       for (const { discordUsername, cohortName, cohortLevel } of parsed) {
-        const member = (await members()).find(
+        const member = allMembers.find(
           (m) => m.discordUsername === discordUsername
         );
         if (!member) {
@@ -87,7 +98,7 @@ export function useCohortBulkCreate() {
 
   return {
     isLoading,
-    members,
+    members: membersData,
     parse,
     tryBulkCreate,
   };
