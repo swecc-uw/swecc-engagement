@@ -42,7 +42,7 @@ export const useCohortStats = (memberId?: number): CohortStatsHookResult => {
 
   const cohortsQuery = useQuery({
     queryKey: ['cohorts'],
-    queryFn: getCohorts,
+    queryFn: () => getCohorts(false),
   });
 
   const selectedCohortStats = useMemo(() => {

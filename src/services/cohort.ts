@@ -30,8 +30,12 @@ export async function createCohort(cohort: CohortCreate): Promise<boolean> {
   return response.status === 201;
 }
 
-export async function getCohorts(): Promise<CohortView[]> {
-  const response = await api.get<RawCohortResponse[]>('/cohorts/');
+export async function getCohorts(
+  includeProfiles = true
+): Promise<CohortView[]> {
+  const response = await api.get<RawCohortResponse[]>(
+    `/cohorts/?include_profiles=${includeProfiles}`
+  );
   return response.data.map(deserializeCohort);
 }
 
