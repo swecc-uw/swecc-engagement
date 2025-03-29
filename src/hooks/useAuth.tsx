@@ -85,6 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     gcTime: 10 * 60 * 1000,
   });
 
+
   const loginMutation = useMutation({
     mutationFn: async ({
       username,
