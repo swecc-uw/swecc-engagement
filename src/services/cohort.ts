@@ -97,3 +97,8 @@ export function getCohortStats(cohortId?: string) {
       return null;
     });
 }
+
+export async function getCohortDashboardView() {
+  const response = await api.get(`/cohorts/dashboard/`);
+  return response.data;
+}
