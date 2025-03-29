@@ -109,6 +109,7 @@ const CohortStatsDashboard = () => {
         cohorts={userCohorts}
         selectedCohortId={selectedCohortId}
         onCohortSelect={setSelectedCohortId}
+        loading={loading}
       />
 
       {selectedCohortId === 'all' && (

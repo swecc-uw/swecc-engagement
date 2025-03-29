@@ -8,6 +8,7 @@ import {
 } from '@chakra-ui/react';
 import { memo } from 'react';
 import { AggregateType } from './cohortDashboardTypes';
+import { s } from 'vite/dist/node/types.d-aGj9QkWt';
 
 interface AggregateStatsSelectorProps {
   selectedAggregateType: AggregateType;
@@ -19,6 +20,7 @@ const AggregateStatsSelector = ({
   onAggregateTypeChange,
 }: AggregateStatsSelectorProps) => {
   const tabHoverBgColor = useColorModeValue('blue.50', 'blue.800');
+  const selectionColor = useColorModeValue('black', 'white');
 
   const tooltips = {
     total: 'Sum of all values across cohorts',
@@ -44,6 +46,8 @@ const AggregateStatsSelector = ({
               _hover={{ bg: tabHoverBgColor }}
               _selected={{ boxShadow: 'md' }}
               transition="all 0.2s"
+              color={selectionColor}
+              isDisabled={selectedAggregateType === 'total'}
             >
               Total Stats
             </Tab>
@@ -53,6 +57,8 @@ const AggregateStatsSelector = ({
               _hover={{ bg: tabHoverBgColor }}
               _selected={{ boxShadow: 'md' }}
               transition="all 0.2s"
+              color={selectionColor}
+              isDisabled={selectedAggregateType === 'average'}
             >
               Average Stats
             </Tab>
@@ -62,6 +68,8 @@ const AggregateStatsSelector = ({
               _hover={{ bg: tabHoverBgColor }}
               _selected={{ boxShadow: 'md' }}
               transition="all 0.2s"
+              color={selectionColor}
+              isDisabled={selectedAggregateType === 'max'}
             >
               Max Stats
             </Tab>

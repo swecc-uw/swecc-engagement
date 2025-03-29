@@ -13,12 +13,14 @@ interface CohortSelectionBarProps {
   cohorts: Cohort[];
   selectedCohortId: string;
   onCohortSelect: (id: string) => void;
+  loading?: boolean;
 }
 
 const CohortSelectionBar = ({
   cohorts,
   selectedCohortId,
   onCohortSelect,
+  loading,
 }: CohortSelectionBarProps) => {
   const buttonHoverBgColor = useColorModeValue('blue.100', 'blue.700');
   const activeButtonBgColor = useColorModeValue('blue.500', 'blue.600');
@@ -34,6 +36,16 @@ const CohortSelectionBar = ({
     transition: 'all 0.3s ease',
     fontWeight: 'bold',
   };
+
+  if (loading) {
+    return (
+      <Box mb={6}>
+        <Text fontSize="md" color={textColor} ml={2} textAlign="center">
+          ...
+        </Text>
+      </Box>
+    );
+  }
 
   return (
     <Box
