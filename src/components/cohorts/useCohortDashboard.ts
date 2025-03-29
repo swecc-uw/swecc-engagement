@@ -39,15 +39,6 @@ export const useCohortDashboard = (): CohortDashboardHookResult => {
     refetchOnWindowFocus: false,
   });
 
-  console.log('Cohort Dashboard Data:', dashboardQuery.data);
-  console.log('Query Status:', {
-    isLoading: dashboardQuery.isLoading,
-    isPending: dashboardQuery.isPending,
-    isFetching: dashboardQuery.isFetching,
-    isSuccess: dashboardQuery.isSuccess,
-    isError: dashboardQuery.isError,
-  });
-
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 
@@ -113,8 +104,6 @@ export const useCohortDashboard = (): CohortDashboardHookResult => {
   const totalStats =
     dashboardQuery.data?.cohorts_aggregated_stats_total || initialStats;
   const userCohorts = dashboardQuery.data?.your_cohorts || [];
-
-  console.log('userCohorts:', userCohorts);
 
   return {
     stats,
