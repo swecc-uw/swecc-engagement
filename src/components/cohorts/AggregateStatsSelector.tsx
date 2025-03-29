@@ -22,8 +22,8 @@ const AggregateStatsSelector = ({
 
   const tooltips = {
     total: 'Sum of all values across cohorts',
-    average: 'Average values per cohort',
-    max: 'Maximum values from any cohort',
+    average: 'Average values across all members',
+    max: 'Maximum values across all members',
   };
 
   return (
