@@ -1,169 +1,140 @@
 import {
   Box,
-  Text,
-  useColorModeValue,
-  Badge,
-  Button,
-  Wrap,
-  WrapItem,
   Heading,
+  useColorModeValue,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
 } from '@chakra-ui/react';
 
-import { CohortView } from '../../types';
-import { useAuth } from '../../hooks/useAuth';
-import { useCohortStats } from '../../hooks/useCohortStats';
+import { useCohortDashboard } from './useCohortDashboard';
 import ApplicationStats from './ApplicationStats';
-import MyCohortView from './MyCohortView';
-import CohortList from './CohortList';
+import CohortSelectionBar from './CohortSelectionBar';
+import AggregateStatsSelector from './AggregateStatsSelector';
+import { useState, useEffect, useCallback } from 'react';
+import { AggregateType } from './cohortDashboardTypes';
 
-// Cohort Selection Bar Component
-const CohortSelectionBar = ({
-  cohorts,
-  selectedCohortId,
-  onCohortSelect,
-}: {
-  cohorts: CohortView[];
-  allCohorts: CohortView[];
-  selectedCohortId: string;
-  onCohortSelect: (id: string) => void;
-}) => {
-  const buttonStyles = {
-    size: 'md',
-    borderRadius: 'md',
-    px: 6,
-    _active: { opacity: 0.8 },
-    transition: 'all 0.2s',
-    fontWeight: 'bold',
-  };
+interface CohortDashboardLayoutProps {
+  children: React.ReactNode;
+  title: string;
+  isLoading: boolean;
+}
+
+const CohortDashboardLayout = ({
+  children,
+  title,
+}: CohortDashboardLayoutProps) => {
+  const bgColor = useColorModeValue('gray.50', 'gray.700');
+  const textColor = useColorModeValue('gray.800', 'gray.100');
 
   return (
-    <Box mb={6} overflowX="auto">
-      <Wrap spacing={3} justify="center">
-        <WrapItem>
-          <Button
-            {...buttonStyles}
-            colorScheme="blue"
-            variant={selectedCohortId === 'all' ? 'solid' : 'ghost'}
-            onClick={() => onCohortSelect('all')}
-            _hover={{ bg: selectedCohortId === 'all' ? 'blue.600' : 'blue.50' }}
-          >
-            <Text as="span" opacity={selectedCohortId === 'all' ? 1 : 0.8}>
-              All Cohorts
-            </Text>
-          </Button>
-        </WrapItem>
-        {cohorts.map((cohort) => (
-          <WrapItem key={cohort.id}>
-            <Button
-              {...buttonStyles}
-              colorScheme="blue"
-              variant={
-                selectedCohortId === cohort.id.toString() ? 'solid' : 'ghost'
-              }
-              onClick={() => onCohortSelect(cohort.id.toString())}
-              _hover={{
-                bg:
-                  selectedCohortId === cohort.id.toString()
-                    ? 'blue.600'
-                    : 'blue.50',
-              }}
-            >
-              <Text
-                as="span"
-                opacity={selectedCohortId === cohort.id.toString() ? 1 : 0.8}
-              >
-                {cohort.name}
-              </Text>
-              <Badge ml={2} colorScheme="blue" borderRadius="full" px={2}>
-                {cohort.members?.length || 0}
-              </Badge>
-            </Button>
-          </WrapItem>
-        ))}
-        {!cohorts?.length && (
-          <WrapItem>
-            <Text fontSize="md" color="gray.500" ml={2}>
-              You are not currently part of any cohorts
-            </Text>
-          </WrapItem>
-        )}
-      </Wrap>
+    <Box
+      bg={bgColor}
+      p={{ base: 4, md: 6 }}
+      borderRadius="lg"
+      boxShadow="lg"
+      transition="all 0.3s ease"
+    >
+      <Heading as="h2" size="lg" mb={6} color={textColor}>
+        {title}
+      </Heading>
+      {children}
     </Box>
   );
 };
 
-// Base layout wrapper
-const CohortDashboardLayout = ({
-  children,
-  cohorts,
-  allCohorts,
-  selectedCohortId,
-  onCohortSelect,
-}: {
-  children: React.ReactNode;
-  cohorts: CohortView[];
-  allCohorts: CohortView[];
-  selectedCohortId: string;
-  onCohortSelect: (id: string) => void;
-}) => (
-  <Box
-    bg={useColorModeValue('gray.50', 'gray.700')}
-    p={6}
-    borderRadius="lg"
-    boxShadow="lg"
-  >
-    <CohortSelectionBar
-      cohorts={cohorts}
-      allCohorts={allCohorts}
-      selectedCohortId={selectedCohortId}
-      onCohortSelect={onCohortSelect}
-    />
-    {children}
-  </Box>
-);
-
 const CohortStatsDashboard = () => {
-  const { member } = useAuth();
-
   const {
     stats,
     averageStats,
-    allCohorts,
+    maxStats,
+    totalStats,
     userCohorts,
     selectedCohortId,
     loading,
     error,
     setSelectedCohortId,
     conversionRates,
-  } = useCohortStats(member?.id);
+  } = useCohortDashboard();
+
+  const [selectedAggregateType, setSelectedAggregateType] =
+    useState<AggregateType>('total');
+
+  const alertBgColor = useColorModeValue('red.50', 'red.900');
+  const alertTitleColor = useColorModeValue('red.500', 'red.300');
+  const alertTextColor = useColorModeValue('red.600', 'red.200');
+
+  const selectedCohort =
+    selectedCohortId !== 'all'
+      ? userCohorts.find((c) => c.id === parseInt(selectedCohortId, 10))
+      : null;
+
+  const handleAggregateTypeChange = useCallback((type: AggregateType) => {
+    setSelectedAggregateType(type);
+  }, []);
+
+  useEffect(() => {
+    if (selectedCohortId !== 'all') {
+      setSelectedAggregateType('total');
+    }
+  }, [selectedCohortId]);
+
+  const displayStats =
+    selectedCohortId === 'all'
+      ? selectedAggregateType === 'total'
+        ? totalStats
+        : selectedAggregateType === 'average'
+        ? averageStats
+        : maxStats
+      : stats;
+
+  const comparisonStats =
+    selectedCohortId === 'all' ? averageStats : averageStats;
+
+  const dashboardTitle =
+    selectedCohortId === 'all'
+      ? selectedAggregateType === 'total'
+        ? 'Cohort Totals'
+        : selectedAggregateType === 'average'
+        ? 'Member Averages'
+        : selectedAggregateType === 'max'
+        ? 'Member Maximums'
+        : ''
+      : selectedCohort?.name || 'Cohort Statistics';
 
   return (
-    <CohortDashboardLayout
-      cohorts={userCohorts || []}
-      allCohorts={allCohorts || []}
-      selectedCohortId={selectedCohortId}
-      onCohortSelect={setSelectedCohortId}
-    >
+    <CohortDashboardLayout title={dashboardTitle} isLoading={loading}>
+      <CohortSelectionBar
+        cohorts={userCohorts}
+        selectedCohortId={selectedCohortId}
+        onCohortSelect={setSelectedCohortId}
+      />
+
+      {selectedCohortId === 'all' && (
+        <AggregateStatsSelector
+          selectedAggregateType={selectedAggregateType}
+          onAggregateTypeChange={handleAggregateTypeChange}
+        />
+      )}
+
+      {error && (
+        <Alert status="error" mb={6} borderRadius="md" bg={alertBgColor}>
+          <AlertIcon />
+          <AlertTitle color={alertTitleColor}>Error!</AlertTitle>
+          <AlertDescription color={alertTextColor}>{error}</AlertDescription>
+        </Alert>
+      )}
+
       <ApplicationStats
         loading={loading}
         error={error}
-        stats={stats}
+        stats={displayStats}
         selectedCohortId={selectedCohortId}
-        averageStats={averageStats}
+        averageStats={comparisonStats}
         conversionRates={conversionRates}
+        aggregateType={selectedAggregateType}
       />
-      {selectedCohortId === 'all' ? (
-        <CohortList cohorts={allCohorts} />
-      ) : (
-        <MyCohortView
-          cohort={allCohorts.find((c) => String(c.id) === selectedCohortId)}
-          heading={
-            <Heading as="h2" size="lg" mb={6}>
-              Members
-            </Heading>
-          }
-        />
-      )}
     </CohortDashboardLayout>
   );
 };

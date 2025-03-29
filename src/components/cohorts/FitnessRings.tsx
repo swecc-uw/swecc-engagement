@@ -1,28 +1,53 @@
 import { useColorModeValue } from '@chakra-ui/react';
-import { useRef } from 'react';
-import { Ring } from './ApplicationStats';
-import { TooltipState } from './ApplicationStats';
+import { memo, useRef, useCallback } from 'react';
+import { Ring, TooltipState } from './cohortDashboardTypes';
 
-// Fitness Rings Component
+interface FitnessRingsProps {
+  rings: Ring[];
+  tooltip: TooltipState;
+  onShowTooltip: (ring: Ring) => void;
+  onHideTooltip: () => void;
+}
+
 const FitnessRings = ({
   rings,
   tooltip,
   onShowTooltip,
   onHideTooltip,
-}: {
-  rings: Ring[];
-  tooltip: TooltipState;
-  onShowTooltip: (ring: Ring) => void;
-  onHideTooltip: () => void;
-}) => {
+}: FitnessRingsProps) => {
   const centerX = 150;
   const centerY = 150;
   const ringWidth = 20;
-  const svgRef = useRef(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+
   const bgColor = useColorModeValue('#e2e8f0', '#2D3748');
+  const tooltipBgColor = useColorModeValue(
+    'rgba(0,0,0,0.75)',
+    'rgba(0,0,0,0.9)'
+  );
+  const tooltipTextColor = useColorModeValue('#ffffff', '#ffffff');
+  const textShadowColor = useColorModeValue('rgba(0,0,0,0.8)', 'rgba(0,0,0,1)');
+  const ringGlowColor = useColorModeValue(
+    'rgba(255,255,255,0.5)',
+    'rgba(255,255,255,0.3)'
+  );
+
+  const handleShowTooltip = useCallback(
+    (ring: Ring) => {
+      onShowTooltip(ring);
+    },
+    [onShowTooltip]
+  );
 
   return (
-    <svg width="300" height="300" viewBox="0 0 300 300" ref={svgRef}>
+    <svg
+      width="300"
+      height="300"
+      viewBox="0 0 300 300"
+      ref={svgRef}
+      role="img"
+      aria-label="Application funnel visualization"
+    >
       {rings.map((ring, index) => {
         const radius = ring.radius;
         const circumference = 2 * Math.PI * radius;
@@ -40,6 +65,7 @@ const FitnessRings = ({
               fill="none"
               stroke={bgColor}
               strokeWidth={ringWidth}
+              aria-hidden="true"
             />
             <circle
               cx={centerX}
@@ -52,28 +78,30 @@ const FitnessRings = ({
               strokeDashoffset={dashoffset}
               strokeLinecap="round"
               transform={`rotate(-90 ${centerX} ${centerY})`}
-              onMouseEnter={() => onShowTooltip(ring)}
+              onMouseEnter={() => handleShowTooltip(ring)}
               onMouseLeave={onHideTooltip}
               style={{
                 cursor: 'pointer',
-                transition: 'opacity 0.2s',
+                transition: 'stroke-dashoffset 0.5s ease, opacity 0.2s',
                 filter: ring.exceedsAverage
-                  ? 'brightness(1.3) drop-shadow(0 0 4px rgba(255,255,255,0.5))'
+                  ? `brightness(1.3) drop-shadow(0 0 4px ${ringGlowColor})`
                   : 'none',
                 opacity: 0.9,
               }}
+              role="graphics-symbol"
+              aria-label={`${ring.name}: ${ring.value} out of ${ring.total}`}
             />
             {ring.exceedsAverage && (
               <text
                 x={centerX}
                 y={centerY - radius}
-                fill="white"
+                fill={tooltipTextColor}
                 fontSize="12"
                 fontWeight="bold"
                 textAnchor="middle"
                 dominantBaseline="middle"
                 style={{
-                  filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.8))',
+                  filter: `drop-shadow(0 0 2px ${textShadowColor})`,
                   paintOrder: 'stroke',
                   stroke: ring.color,
                   strokeWidth: '3px',
@@ -96,14 +124,14 @@ const FitnessRings = ({
             width={tooltip.width}
             height="24"
             rx="5"
-            fill="rgba(0,0,0,0.75)"
+            fill={tooltipBgColor}
           />
           <text
             x={centerX}
             y={tooltip.y - 18}
             textAnchor="middle"
             alignmentBaseline="middle"
-            fill="white"
+            fill={tooltipTextColor}
             fontSize="12"
           >
             {tooltip.content}
@@ -114,4 +142,4 @@ const FitnessRings = ({
   );
 };
 
-export default FitnessRings;
+export default memo(FitnessRings);
