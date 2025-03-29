@@ -8,7 +8,6 @@ import {
 } from '@chakra-ui/react';
 import { memo } from 'react';
 import { AggregateType } from './cohortDashboardTypes';
-import { s } from 'vite/dist/node/types.d-aGj9QkWt';
 
 interface AggregateStatsSelectorProps {
   selectedAggregateType: AggregateType;
