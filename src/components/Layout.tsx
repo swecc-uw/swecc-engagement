@@ -20,6 +20,7 @@ import {
   DrawerContent,
   DrawerCloseButton,
   useColorMode,
+  Image,
 } from '@chakra-ui/react';
 import SWECC_LOGO from '../assets/transp-swecc-logo.png';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -141,39 +142,45 @@ const Navbar: React.FC<NavBarProps> = ({
     >
       <Container maxW="container.xl" py={3}>
         <Flex justify="space-between" align="center" height="60px">
-          <Link to="/">
-            <ChakraLink
-              as="span"
-              display="flex"
-              alignItems="center"
-              onClick={onClose}
-              _hover={{ textDecoration: 'none' }}
-            >
-              <Box height="40px" display="flex" alignItems="center">
-                <img
-                  src={SWECC_LOGO}
-                  alt="SWECC Logo"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    filter:
-                      colorMode === 'dark'
-                        ? 'brightness(1) contrast(1.2)'
-                        : 'brightness(0.6) contrast(1.5)',
-                  }}
-                />
-              </Box>
-              <Text
-                fontSize={{ base: 'xl', md: '2xl' }}
-                fontWeight="bold"
-                fontFamily="monospace"
-                ml={4}
-                display={{ base: 'none', md: 'block' }}
+          <Flex align="center">
+            <Link to="/">
+              <ChakraLink
+                as="span"
+                display="flex"
+                alignItems="center"
+                onClick={onClose}
+                _hover={{ textDecoration: 'none' }}
               >
-                <em>Engagement</em>
-              </Text>
-            </ChakraLink>
-          </Link>
+                <Box
+                  width="8em"
+                  display="flex"
+                  alignItems="center"
+                  flexShrink={0}
+                >
+                  <Image
+                    src={SWECC_LOGO}
+                    alt="SWECC Logo"
+                    style={{
+                      objectFit: 'contain',
+                      filter:
+                        colorMode === 'dark'
+                          ? 'brightness(1) contrast(1.2)'
+                          : 'brightness(0.6) contrast(1.5)',
+                    }}
+                  />
+                </Box>
+                <Text
+                  fontSize={{ base: 'xl', md: '2xl' }}
+                  fontWeight="bold"
+                  fontFamily="monospace"
+                  ml={3}
+                  display={{ base: 'block', md: 'block' }}
+                >
+                  <em>Engagement</em>
+                </Text>
+              </ChakraLink>
+            </Link>
+          </Flex>
 
           <Flex align="center" gap={4}>
             <NavLinks />
@@ -221,7 +228,6 @@ const Navbar: React.FC<NavBarProps> = ({
           </Flex>
         </Flex>
       </Container>
-
       <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
         <DrawerOverlay />
         <DrawerContent bg={bgColor}>
@@ -326,9 +332,17 @@ const NavLink: React.FC<NavLinkProps> = ({ to, children }) => {
 };
 
 const Footer: React.FC = () => {
-  const bg = useColorModeValue('gray.50', 'gray.900');
+  const bg = useColorModeValue(
+    'linear-gradient(to top, rgba(255,255,255,0.3), transparent)',
+    'linear-gradient(to top, rgba(0,0,0,0.3), transparent)'
+  );
   const color = useColorModeValue('gray.700', 'gray.200');
   const hoverColor = useColorModeValue('blue.500', 'blue.300');
+
+  const textShadow = useColorModeValue(
+    '0 0 8px rgba(255,255,255,0.7)',
+    '0 0 8px rgba(0,0,0,0.7)'
+  );
 
   const socialLinks = [
     { icon: FaInstagram, href: SWECC_INSTAGRAM_LINK, label: 'Instagram' },
@@ -340,10 +354,17 @@ const Footer: React.FC = () => {
   ];
 
   return (
-    <Box as="footer" bg={bg} color={color} mt="auto">
-      <Container maxW="container.xl" py={12}>
+    <Box
+      as="footer"
+      color={color}
+      mt="auto"
+      position="relative"
+      backgroundImage={bg}
+      py={12}
+    >
+      <Container maxW="container.xl">
         <Flex direction="column" align="center">
-          <HStack spacing={6} mb={8}>
+          <HStack spacing={6} mb={8} zIndex="1">
             {socialLinks.map((link) => (
               <ChakraLink
                 key={link.label}
@@ -351,13 +372,19 @@ const Footer: React.FC = () => {
                 isExternal
                 _hover={{ color: hoverColor }}
                 aria-label={link.label}
+                textShadow={textShadow}
               >
                 <link.icon size={24} />
               </ChakraLink>
             ))}
           </HStack>
 
-          <Text textAlign="center" fontSize="sm">
+          <Text
+            textAlign="center"
+            fontSize="sm"
+            textShadow={textShadow}
+            zIndex="1"
+          >
             © {new Date().getFullYear()} Software Engineering Career Club
             (SWECC). All rights reserved.
           </Text>

@@ -36,12 +36,12 @@ const HomePage: React.FC = () => {
   return (
     <Box position="relative" minH="100vh" overflow="hidden">
       <Box
-        position="absolute"
+        position="fixed"
         top="0"
         left="0"
         width="100%"
         height="100%"
-        zIndex="0"
+        zIndex="1"
       >
         <GravitySimulation />
       </Box>
@@ -49,7 +49,7 @@ const HomePage: React.FC = () => {
       <Box
         position="relative"
         zIndex="1"
-        pt={{ base: '80px', md: '120px' }}
+        mt={{ base: '80px', md: '120px' }}
         pb="60px"
         backdropFilter="blur(2px)"
       >
