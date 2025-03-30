@@ -60,7 +60,7 @@ const checkSession = async (): Promise<boolean> => {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const queryClient = useQueryClient();
   const [error, setError] = useState<string>();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>();
 
   const sessionQuery = useQuery({
     queryKey: ['authSession'],
@@ -80,9 +80,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const userQuery = useQuery({
     queryKey: ['currentUser'],
     queryFn: getCurrentUser,
-    enabled: isAuthenticated === true,
+    enabled: isAuthenticated === undefined || isAuthenticated === true,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
+    retry(failureCount) {
+      return failureCount < 1;
+    },
   });
 
   const loginMutation = useMutation({
@@ -235,7 +238,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const loading =
     sessionQuery.isPending ||
-    isAuthenticated === null ||
+    isAuthenticated === undefined ||
     (isAuthenticated && userQuery.isPending);
 
   return (

@@ -10,7 +10,7 @@ import {
 import { useState, useEffect } from 'react';
 import { deleteCohort, getCohorts } from '../../services/cohort';
 import { CohortView } from '../../types';
-import CohortCard from '../../components/CohortCard';
+import CohortCard from '../../components/cohorts/CohortCard';
 import { useNavigate } from 'react-router-dom';
 
 export default function CohortDashboard() {
