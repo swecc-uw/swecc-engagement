@@ -7,8 +7,8 @@ import {
   Heading,
 } from '@chakra-ui/react';
 import { Edit, Trash2 } from 'lucide-react';
-import { CohortView } from '../types';
-import MemberList from './MemberList';
+import { CohortView } from '../../types';
+import MemberList from '../MemberList';
 
 interface CohortCardProps {
   cohort: CohortView;
