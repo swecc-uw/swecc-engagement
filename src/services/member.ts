@@ -127,3 +127,11 @@ export async function getAllMembers(): Promise<Member[]> {
 
   return res.data.map(deserializeMember);
 }
+
+export async function confirmUWEmail(token: string) {
+  const url = `/members/verify-school-email/${token}/`;
+
+  const res = await api.post(url);
+
+  if (res.status !== 200) throw new Error(res.data.detail ?? '');
+}
