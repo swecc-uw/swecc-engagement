@@ -23,6 +23,7 @@ import AdminSessionPage from './pages/admin/AdminSessionPage';
 import CohortDashboard from './pages/admin/CohortDashboard';
 import CreateUpdateCohortPage from './pages/admin/CreateUpdateCohortPage';
 import BulkCohortUploadPage from './pages/admin/BulkCohortUploadPage';
+import { VerifyEmailPage } from './pages/VerifyEmailPage';
 
 const App: React.FC = () => {
   return (
@@ -146,6 +147,14 @@ const App: React.FC = () => {
             <Route
               path="/admin/cohorts/upload"
               element={<BulkCohortUploadPage />}
+            />
+            <Route
+              path="/verify-school-email/:token"
+              element={
+                <ProtectedRoute>
+                  <VerifyEmailPage />
+                </ProtectedRoute>
+              }
             />
           </Routes>
         </Layout>
