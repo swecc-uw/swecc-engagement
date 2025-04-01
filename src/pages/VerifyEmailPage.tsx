@@ -9,24 +9,22 @@ export const VerifyEmailPage: React.FC = () => {
   const navigate = useNavigate();
 
   const confirmEmail = async () => {
-    {
-      try {
-        await confirmUWEmail(token!);
-        toast({
-          title: 'Email confirmed successfully!',
-          status: 'success',
-          duration: 5000,
-        });
-      } catch (error) {
-        toast({
-          title: 'Failed to confirm email.',
-          description: (error as Error).message,
-          status: 'error',
-          duration: 5000,
-        });
-      }
-      navigate('/');
+    try {
+      await confirmUWEmail(token!);
+      toast({
+        title: 'Email confirmed successfully!',
+        status: 'success',
+        duration: 5000,
+      });
+    } catch (error) {
+      toast({
+        title: 'Failed to confirm email.',
+        description: (error as Error).message,
+        status: 'error',
+        duration: 5000,
+      });
     }
+    navigate('/');
   };
 
   return (
