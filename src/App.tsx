@@ -24,6 +24,7 @@ import CohortDashboard from './pages/admin/CohortDashboard';
 import CreateUpdateCohortPage from './pages/admin/CreateUpdateCohortPage';
 import BulkCohortUploadPage from './pages/admin/BulkCohortUploadPage';
 import { VerifyEmailPage } from './pages/VerifyEmailPage';
+import CohortStatsDashboard from './components/cohorts/CohortStatsDashboard';
 
 const App: React.FC = () => {
   return (
@@ -153,6 +154,14 @@ const App: React.FC = () => {
               element={
                 <ProtectedRoute>
                   <VerifyEmailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cohorts"
+              element={
+                <ProtectedRoute>
+                  <CohortStatsDashboard />
                 </ProtectedRoute>
               }
             />

@@ -19,12 +19,13 @@ export const getCSRF = async () => {
     devPrint('Failed to fetch CSRF token:', error);
   }
 };
-
+let cond = false;
 api.interceptors.request.use(async (config) => {
   if (config.url === '/auth/csrf/') {
     return config;
   }
-  if (!api.defaults.headers.common['X-CSRFToken']) {
+  if (!cond && !api.defaults.headers.common['X-CSRFToken']) {
+    cond = true;
     await getCSRF();
   }
   return config;

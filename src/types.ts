@@ -289,6 +289,13 @@ export interface AttendanceSession {
 }
 
 export type DiscordMessageStats = Record<string, number>;
+export type LeetcodeStats = Record<string, number>;
+export type GithubStats = Record<string, number>;
+
+export interface UserStats {
+  leetcode: LeetcodeStats;
+  github: GithubStats;
+}
 
 export interface RawStatsResponseRecord {
   member: RawMemberData;
@@ -304,6 +311,19 @@ export interface CohortView {
   id: number;
   name: string;
   members: Member[];
+}
+
+export interface CohortDetails {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  status: 'ACTIVE' | 'COMPLETED' | 'PLANNED';
+  students?: {
+    id: string;
+    name: string;
+    email: string;
+  }[];
 }
 
 export interface CohortCreate {

@@ -45,12 +45,16 @@ const MemberCard = ({
   member: Member;
   actionElement?: (member: Member) => React.ReactNode;
 }) => {
-  const bgColor = 'white';
-  const borderColor = 'gray.100';
-  const textColor = 'gray.600';
-  const mutedColor = 'gray.500';
-  const hoverBg = 'gray.50';
-  const iconColor = 'gray.600';
+  const bgColor = useColorModeValue('white', 'gray.800');
+  const borderColor = useColorModeValue('gray.100', 'gray.700');
+  const textColor = useColorModeValue('gray.600', 'gray.300');
+  const mutedColor = useColorModeValue('gray.500', 'gray.400');
+  const hoverBg = useColorModeValue('gray.50', 'gray.700');
+  const iconColor = useColorModeValue('gray.600', 'gray.400');
+  const iconHoverBg = useColorModeValue('blue.50', 'blue.900');
+  const iconHoverColor = useColorModeValue('blue.500', 'blue.300');
+  const borderHoverColor = useColorModeValue('blue.200', 'blue.500');
+  const avatarBorderColor = useColorModeValue('blue.400', 'blue.300');
 
   const fullName = resolveName(member);
 
@@ -64,12 +68,13 @@ const MemberCard = ({
       boxShadow="sm"
       _hover={{
         boxShadow: 'md',
-        borderColor: 'blue.200',
+        borderColor: borderHoverColor,
         bg: hoverBg,
         transform: 'translateY(-2px)',
       }}
       transition="all 0.2s"
       w="100%"
+      key={member.id}
     >
       <Flex direction={{ base: 'column', sm: 'row' }} gap={4}>
         <Avatar
@@ -77,7 +82,7 @@ const MemberCard = ({
           name={fullName}
           src={member.profilePictureUrl}
           borderWidth={2}
-          borderColor="blue.400"
+          borderColor={avatarBorderColor}
         />
 
         <Box flex="1">
@@ -117,7 +122,7 @@ const MemberCard = ({
                     variant="ghost"
                     color={iconColor}
                     size="sm"
-                    _hover={{ color: 'blue.500', bg: 'blue.50' }}
+                    _hover={{ color: iconHoverColor, bg: iconHoverBg }}
                   />
                 </Tooltip>
               )}
@@ -133,7 +138,7 @@ const MemberCard = ({
                     variant="ghost"
                     color={iconColor}
                     size="sm"
-                    _hover={{ color: 'blue.500', bg: 'blue.50' }}
+                    _hover={{ color: iconHoverColor, bg: iconHoverBg }}
                   />
                 </Tooltip>
               )}
@@ -149,7 +154,7 @@ const MemberCard = ({
                     variant="ghost"
                     color={iconColor}
                     size="sm"
-                    _hover={{ color: 'blue.500', bg: 'blue.50' }}
+                    _hover={{ color: iconHoverColor, bg: iconHoverBg }}
                   />
                 </Tooltip>
               )}
@@ -204,8 +209,12 @@ const MemberCard = ({
                   {member.role}
                 </Badge>
               )}
-              {member.groups?.map((group) => (
-                <Badge key={group.name} colorScheme="blue" fontSize="xs">
+              {member.groups?.map((group, index) => (
+                <Badge
+                  key={`${member.id}-group-${index}-${group.name}`}
+                  colorScheme="blue"
+                  fontSize="xs"
+                >
                   {group.name}
                 </Badge>
               ))}
@@ -258,6 +267,7 @@ const MemberList: React.FC<MemberListProps> = ({
   actionElement,
 }) => {
   const skeletonCount = loading ? Math.max(members.length, 3) : 0;
+  const noMembersColor = useColorModeValue('gray.500', 'gray.400');
 
   return (
     <VStack spacing={6} align="stretch" w="100%">
@@ -279,7 +289,7 @@ const MemberList: React.FC<MemberListProps> = ({
         </VStack>
       ) : (
         <Center p={8}>
-          <Text color="gray.500">No members found</Text>
+          <Text color={noMembersColor}>No members found</Text>
         </Center>
       )}
 

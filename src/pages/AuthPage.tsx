@@ -57,9 +57,14 @@ const AuthPage: React.FC = () => {
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
-    await login(username, password);
-    setLoading(false);
+    try {
+      setLoading(true);
+      await login(username, password);
+    } catch (error) {
+      setError('Invalid username or password.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {

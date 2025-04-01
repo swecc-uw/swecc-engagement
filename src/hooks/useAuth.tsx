@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, {
   createContext,
   useContext,
@@ -5,6 +6,7 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api, { getCSRF } from '../services/api';
 import { devPrint } from '../components/utils/RandomUtils';
 import { Member } from '../types';
@@ -46,62 +48,139 @@ export const useAuth = (): AuthContextType => {
   return context;
 };
 
+const checkSession = async (): Promise<boolean> => {
+  try {
+    await api.get('/auth/session/');
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const [isVerified, setIsVerified] = useState<boolean>(false);
+  const queryClient = useQueryClient();
   const [error, setError] = useState<string>();
-  const [member, setMember] = useState<Member>();
-  const [loading, setLoading] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>();
+
+  const sessionQuery = useQuery({
+    queryKey: ['authSession'],
+    queryFn: checkSession,
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: true,
+  });
 
   useEffect(() => {
-    getSession();
-  }, []);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      getCurrentUser()
-        .then((mem) => {
-          setMember(mem);
-          const groups = mem.groups?.map((value) => value.name);
-          setIsAdmin(groups?.includes('is_admin') ?? false);
-          setIsVerified(groups?.includes('is_verified') ?? false);
-          setLoading(false);
-        })
-        .catch((err) => {
-          devPrint('Failed to get current user:', err);
-          setMember(undefined);
-        });
-    } else {
-      setMember(undefined);
+    if (!sessionQuery.isPending) {
+      setIsAuthenticated(sessionQuery.data === true);
     }
-  }, [isAuthenticated]);
+  }, [sessionQuery.data, sessionQuery.isPending]);
 
-  const getSession = async (): Promise<void> => {
-    try {
-      await api.get('/auth/session/');
-      setIsAuthenticated(true);
-    } catch (err) {
-      setIsAuthenticated(false);
-      setLoading(false);
-    }
-  };
+  const userQuery = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: getCurrentUser,
+    enabled: isAuthenticated === undefined || isAuthenticated === true,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    retry(failureCount) {
+      return failureCount < 1;
+    },
+  });
 
-  const login = async (username: string, password: string): Promise<void> => {
-    try {
-      const res = await api.post('/auth/login/', { username, password });
-
+  const loginMutation = useMutation({
+    mutationFn: async ({
+      username,
+      password,
+    }: {
+      username: string;
+      password: string;
+    }) => {
+      return api.post('/auth/login/', { username, password });
+    },
+    onSuccess: (res) => {
       if (res.status === 200) {
         getCSRF();
         setIsAuthenticated(true);
         setError('');
+
+        queryClient.invalidateQueries({ queryKey: ['authSession'] });
+        queryClient.invalidateQueries({ queryKey: ['currentUser'] });
       } else {
         handleLoginError(res.data);
       }
-    } catch (err: any) {
+    },
+    onError: (err: any) => {
       handleLoginError(err.response?.data);
-    }
-  };
+    },
+  });
+
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      return api.post('/auth/logout/');
+    },
+    onSuccess: (res) => {
+      if (res.status === 200) {
+        devPrint('Logout successful');
+        getCSRF();
+        setIsAuthenticated(false);
+
+        queryClient.invalidateQueries({ queryKey: ['authSession'] });
+        queryClient.resetQueries({ queryKey: ['currentUser'] });
+      } else {
+        devPrint('Logout failed');
+      }
+    },
+    onError: (err) => {
+      devPrint('Logout failed', err);
+    },
+  });
+
+  const registerMutation = useMutation({
+    mutationFn: async ({
+      firstName,
+      lastName,
+      username,
+      email,
+      password,
+      discordUsername,
+    }: {
+      firstName: string;
+      lastName: string;
+      username: string;
+      email: string;
+      password: string;
+      discordUsername: string;
+    }) => {
+      return api.post('/auth/register/', {
+        first_name: firstName,
+        last_name: lastName,
+        username,
+        email,
+        password,
+        discord_username: discordUsername,
+      });
+    },
+    onSuccess: (res) => {
+      if (res.status === 201) {
+        const data = res.data;
+        setError(
+          `Registration successful. Please type /verify in the swecc server and enter ${
+            data.username || res.data.username
+          }`
+        );
+        getCSRF();
+        return data.id;
+      }
+      throw new Error('Registration failed.');
+    },
+    onError: (err: any) => {
+      devPrint('Registration failed:', err.response?.data);
+      setError(
+        err.response?.data?.detail || 'Registration failed. Please try again.'
+      );
+    },
+  });
 
   const handleLoginError = (errorData: any) => {
     if (
@@ -117,20 +196,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const logout = async (): Promise<void> => {
-    try {
-      const res = await api.post('/auth/logout/');
+  const login = async (username: string, password: string): Promise<void> => {
+    await loginMutation.mutateAsync({ username, password });
+  };
 
-      if (res.status === 200) {
-        devPrint('Logout successful');
-        getCSRF();
-        setIsAuthenticated(false);
-      } else {
-        devPrint('Logout failed');
-      }
-    } catch (err) {
-      devPrint('Logout failed');
-    }
+  const logout = async (): Promise<void> => {
+    await logoutMutation.mutateAsync();
   };
 
   const register = async (
@@ -142,29 +213,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     discordUsername: string
   ): Promise<number | undefined> => {
     try {
-      const res = await api.post('/auth/register/', {
-        first_name: firstName,
-        last_name: lastName,
+      const result = await registerMutation.mutateAsync({
+        firstName,
+        lastName,
         username,
         email,
         password,
-        discord_username: discordUsername,
+        discordUsername,
       });
-
-      if (res.status !== 201) throw new Error('Registration failed.');
-
-      const data = res.data;
-      setError(
-        `Registration successful. Please type /verify in the swecc server and enter ${username}`
-      );
-      getCSRF();
-      return data.id;
-    } catch (err: any) {
-      devPrint('Registration failed:', err.response?.data);
-      setError(
-        err.response?.data?.detail || 'Registration failed. Please try again.'
-      );
-      return;
+      return result?.data?.id;
+    } catch (err) {
+      return undefined;
     }
   };
 
@@ -172,10 +231,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(undefined);
   };
 
+  const member = userQuery.data;
+  const groups = member?.groups?.map((value) => value.name) || [];
+  const isAdmin = groups.includes('is_admin');
+  const isVerified = groups.includes('is_verified');
+
+  const loading =
+    sessionQuery.isPending ||
+    isAuthenticated === undefined ||
+    (isAuthenticated && userQuery.isPending);
+
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated,
+        isAuthenticated: isAuthenticated === true,
         error,
         loading,
         member,

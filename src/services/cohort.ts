@@ -30,8 +30,12 @@ export async function createCohort(cohort: CohortCreate): Promise<boolean> {
   return response.status === 201;
 }
 
-export async function getCohorts(): Promise<CohortView[]> {
-  const response = await api.get<RawCohortResponse[]>('/cohorts/');
+export async function getCohorts(
+  includeProfiles = true
+): Promise<CohortView[]> {
+  const response = await api.get<RawCohortResponse[]>(
+    `/cohorts/?include_profiles=${includeProfiles}`
+  );
   return response.data.map(deserializeCohort);
 }
 
@@ -78,4 +82,23 @@ export async function transferToCohort(
   });
 
   return response.status === 200;
+}
+
+export function getCohortStats(cohortId?: string) {
+  const params = new URLSearchParams({
+    ...(cohortId && { cohort_id: cohortId }),
+  });
+
+  return api
+    .get(`/cohorts/stats/?${params}`)
+    .then((res) => res.data)
+    .catch((err) => {
+      console.error(err);
+      return null;
+    });
+}
+
+export async function getCohortDashboardView() {
+  const response = await api.get(`/cohorts/dashboard/`);
+  return response.data;
 }

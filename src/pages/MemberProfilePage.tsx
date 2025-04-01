@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import MemberProfileEdit from '../components/MemberProfileEdit';
 import MemberProfileView from '../components/MemberProfileView';
 import { useAuth } from '../hooks/useAuth';
-import { Member } from '../types';
+import { GithubStats, LeetcodeStats, Member } from '../types';
 import {
   Box,
   Button,
@@ -21,11 +21,12 @@ import {
   Flex,
   Divider,
   As,
+  useColorMode,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import LeetcodeProfile from '../components/LeetcodeProfile';
-import GitHubCalendar, { Activity, ThemeInput } from 'react-github-calendar';
 import { updateMemberProfile } from '../services/member';
+import { getUserStats } from '../services/engagement';
 import { devPrint } from '../components/utils/RandomUtils';
 import {
   FaEdit,
@@ -35,26 +36,7 @@ import {
   FaChartBar,
   FaUser,
 } from 'react-icons/fa';
-import { getToday } from '../localization';
-
-const selectLastHalfYear = (contributions: Activity[]) => {
-  const today = getToday();
-  const currentYear = today.getUTCFullYear();
-  const currentMonth = today.getUTCMonth();
-  const shownMonths = 6;
-
-  return contributions.filter((activity) => {
-    const date = new Date(activity.date);
-    const monthOfDay = date.getUTCMonth();
-
-    return (
-      date.getUTCFullYear() === currentYear &&
-      monthOfDay > currentMonth - shownMonths &&
-      monthOfDay <= currentMonth
-    );
-  });
-};
-
+import GitHubProfile from '../components/GithubProfile';
 interface WidgetCardProps {
   icon: As;
   title: string;
@@ -64,6 +46,8 @@ interface WidgetCardProps {
 const WidgetCard: React.FC<WidgetCardProps> = ({ icon, title, children }) => {
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const bgColor = useColorModeValue('white', 'gray.800');
+  const titleColor = useColorModeValue('gray.800', 'white');
+  const iconColor = useColorModeValue('blue.500', 'blue.300');
 
   return (
     <Card
@@ -73,42 +57,51 @@ const WidgetCard: React.FC<WidgetCardProps> = ({ icon, title, children }) => {
       shadow="lg"
       borderRadius="xl"
       h="full"
+      _hover={{
+        borderColor: useColorModeValue('blue.200', 'blue.500'),
+        transform: 'translateY(-2px)',
+      }}
+      transition="all 0.2s"
     >
       <CardHeader pb={2}>
         <HStack spacing={2}>
-          <Icon as={icon} color="blue.500" boxSize={5} />
-          <Text fontSize="lg" fontWeight="bold">
+          <Icon as={icon} color={iconColor} boxSize={5} />
+          <Text fontSize="lg" fontWeight="bold" color={titleColor}>
             {title}
           </Text>
         </HStack>
       </CardHeader>
-      <Divider />
+      <Divider borderColor={borderColor} />
       <CardBody>{children}</CardBody>
     </Card>
   );
 };
 
 const Widgets: React.FC<{ member: Member }> = ({ member }) => {
-  const [isGithubLoading, setIsGithubLoading] = useState(true);
   const chartBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
-
-  const githubTheme: ThemeInput = {
-    dark: ['#f0f0f0', '#dcd0ff', '#c4a3ff', '#a876ff', '#8a00d4'],
-    light: ['#333333', '#62419d', '#7139bf', '#822df2', '#8a00d4'],
-  };
+  const cardBg = useColorModeValue('white', 'gray.800');
+  const titleColor = useColorModeValue('gray.800', 'white');
+  const iconColor = useColorModeValue('blue.500', 'blue.300');
+  const [githubStats, setGithubStats] = useState<GithubStats>();
+  const [leetcodeStats, setLeetcodeStats] = useState<LeetcodeStats>();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const delay6s = setTimeout(() => {
-      setIsGithubLoading(false);
-    }, 6000);
-
-    return () => clearTimeout(delay6s);
-  }, []);
-
-  if (!member.github && !member.leetcode) {
-    return null;
-  }
+    if (member.github || member.leetcode) {
+      getUserStats(member.id)
+        .then((stats) => {
+          setGithubStats(stats.github);
+          setLeetcodeStats(stats.leetcode);
+        })
+        .catch((error) => {
+          devPrint('Error fetching user stats:', error);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [member]);
 
   return (
     <Card
@@ -118,16 +111,22 @@ const Widgets: React.FC<{ member: Member }> = ({ member }) => {
       shadow="lg"
       w="full"
       maxW="4xl"
+      bg={cardBg}
+      _hover={{
+        borderColor: useColorModeValue('blue.200', 'blue.500'),
+        transform: 'translateY(-2px)',
+      }}
+      transition="all 0.2s"
     >
       <CardHeader>
         <HStack spacing={2}>
-          <Icon as={FaChartBar} color="blue.500" boxSize={5} />
-          <Text fontSize="lg" fontWeight="bold">
+          <Icon as={FaChartBar} color={iconColor} boxSize={5} />
+          <Text fontSize="lg" fontWeight="bold" color={titleColor}>
             Activity Overview
           </Text>
         </HStack>
       </CardHeader>
-      <Divider />
+      <Divider borderColor={borderColor} />
       <CardBody>
         <Stack
           direction={{ base: 'column', lg: 'row' }}
@@ -135,27 +134,34 @@ const Widgets: React.FC<{ member: Member }> = ({ member }) => {
           w="full"
           align="stretch"
         >
-          {member.leetcode && (
+          {member.leetcode && leetcodeStats && (
             <Box flex="1">
               <WidgetCard icon={FaCode} title="LeetCode Stats">
-                <LeetcodeProfile username={member.leetcode.username} />
+                <LeetcodeProfile
+                  username={member.leetcode.username}
+                  stats={{
+                    easy: leetcodeStats['easy_solved'],
+                    medium: leetcodeStats['medium_solved'],
+                    hard: leetcodeStats['hard_solved'],
+                  }}
+                  loading={isLoading}
+                />
               </WidgetCard>
             </Box>
           )}
-          {member.github && (
+          {member.github && githubStats && (
             <Box flex="1">
               <WidgetCard icon={FaGithub} title="GitHub Contributions">
-                <Skeleton isLoaded={!isGithubLoading} borderRadius="lg">
+                <Skeleton isLoaded={!isLoading}>
                   <Box bg={chartBg} p={4} borderRadius="lg" overflowX="auto">
-                    <GitHubCalendar
+                    <GitHubProfile
                       username={member.github.username}
-                      transformData={selectLastHalfYear}
-                      theme={githubTheme}
-                      year={new Date().getFullYear()}
-                      labels={{
-                        totalCount:
-                          '{{count}} contributions in the last 6 months',
+                      stats={{
+                        prs: githubStats['total_prs'],
+                        commits: githubStats['total_commits'],
+                        followers: githubStats['followers'],
                       }}
+                      loading={isLoading}
                     />
                   </Box>
                 </Skeleton>
@@ -174,7 +180,15 @@ const MemberProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [member, setMember] = useState<Member>();
   const [isSaving, setIsSaving] = useState(false);
+  const { colorMode } = useColorMode();
+
   const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const borderColorSel = useColorModeValue('blue.200', 'blue.500');
+  const cardBg = useColorModeValue('white', 'gray.800');
+  const titleColor = useColorModeValue('gray.800', 'white');
+  const iconColor = useColorModeValue('blue.500', 'blue.300');
+  const pageBg = useColorModeValue('gray.50', 'gray.900');
+  const buttonHoverBg = useColorModeValue('red.50', 'red.900');
 
   const onSave = async (updatedMember: Partial<Member>) => {
     setIsSaving(true);
@@ -207,7 +221,7 @@ const MemberProfilePage: React.FC = () => {
   };
 
   return (
-    <Box minH="calc(100vh - 64px)" py={8}>
+    <Box minH="calc(100vh - 64px)" py={8} bg={pageBg}>
       <Container maxW="container.xl" px={{ base: 4, md: 8 }} centerContent>
         <VStack spacing={6} align="stretch" maxW="4xl" w="full">
           {/* header */}
@@ -216,6 +230,12 @@ const MemberProfilePage: React.FC = () => {
             borderColor={borderColor}
             borderRadius="xl"
             shadow="lg"
+            bg={cardBg}
+            _hover={{
+              borderColor: borderColorSel,
+              transform: 'translateY(-2px)',
+            }}
+            transition="all 0.2s"
           >
             <CardHeader>
               <Flex
@@ -225,8 +245,8 @@ const MemberProfilePage: React.FC = () => {
                 gap={4}
               >
                 <HStack spacing={3}>
-                  <Icon as={FaUser} boxSize={6} color="blue.500" />
-                  <Text fontSize="lg" fontWeight="bold">
+                  <Icon as={FaUser} boxSize={6} color={iconColor} />
+                  <Text fontSize="lg" fontWeight="bold" color={titleColor}>
                     Your Profile
                   </Text>
                 </HStack>
@@ -236,6 +256,10 @@ const MemberProfilePage: React.FC = () => {
                     colorScheme="blue"
                     onClick={() => setIsEditing((prev) => !prev)}
                     isLoading={isSaving}
+                    _hover={{
+                      bg: colorMode === 'dark' ? 'blue.600' : '',
+                      transform: 'translateY(-2px)',
+                    }}
                   >
                     {isEditing ? 'Cancel' : 'Edit Profile'}
                   </Button>
@@ -244,6 +268,10 @@ const MemberProfilePage: React.FC = () => {
                     colorScheme="red"
                     variant="ghost"
                     onClick={handleLogout}
+                    _hover={{
+                      bg: buttonHoverBg,
+                      transform: 'translateY(-2px)',
+                    }}
                   >
                     Logout
                   </Button>

@@ -1,6 +1,6 @@
 import { devPrint } from '../components/utils/RandomUtils';
 import { parseAnyDate } from '../localization';
-import { AttendanceSession, RawAttendanceSession } from '../types';
+import { AttendanceSession, RawAttendanceSession, UserStats } from '../types';
 import api from './api';
 import { RawStatsResponseRecord, StatsResponseRecord } from '../types';
 import { deserializeMember } from './member';
@@ -103,4 +103,16 @@ export function queryMessageStats(memberIds: number[], channelIds: string[]) {
     .then((response) =>
       response.data.map(deserializeDiscordStatsResponseRecord)
     );
+}
+
+export function getUserStats(memberId?: number): Promise<UserStats> {
+  const baseUrl = '/engagement/user/';
+
+  return api
+    .get<UserStats>(memberId ? baseUrl + memberId : baseUrl)
+    .then((response) => response.data)
+    .catch((error) => {
+      devPrint('Failed to fetch user stats:', error);
+      throw error;
+    });
 }
